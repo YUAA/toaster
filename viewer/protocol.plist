@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AL</key>
+	<string>Altitude</string>
+	<key>LO</key>
+	<string>GPS Longitude</string>
+	<key>LN</key>
+	<string>GSM Longitude</string>
+	<key>LA</key>
+	<string>GPS Latitude</string>
+	<key>LT</key>
+	<string>GSM Estimated Longitude</string>
+	<key>VL</key>
+	<string>Velocity</string>
+	<key>TO</key>
+	<string>Temperature Outside</string>
+	<key>TI</key>
+	<string>Temperature Inside</string>
+	<key>HU</key>
+	<string>Humidity</string>
+	<key>PR</key>
+	<string>Barometric Pressure</string>
+	<key>LP</key>
+	<string>Liquified Petroleum</string>
+	<key>CO</key>
+	<string>Carbon Monoxide</string>
+	<key>GE</key>
+	<string>Geiger Counts</string>
+	<key>EV</key>
+	<string>East Velocity</string>
+	<key>NV</key>
+	<string>North Velocity</string>
+	<key>UV</key>
+	<string>Up Velocity</string>
+	<key>MC</key>
+	<string>Cellular mmc</string>
+	<key>CD</key>
+	<string>Cellcular cid</string>
+	<key>YA</key>
+	<string>Yaw</string>
+	<key>PI</key>
+	<string>Pitch</string>
+	<key>RO</key>
+	<string>Roll</string>
+	<key>AX</key>
+	<string>Acceleration X</string>
+	<key>AY</key>
+	<string>Acceleration Y</string>
+	<key>AZ</key>
+	<string>Acceleration Z</string>
+	<key>AP</key>
+	<string>Pressure Altitude</string>
+	<key>RH</key>
+	<string>Raw Humidity</string>
+	<key>LV</key>
+	<string>Livliness</string>
+	<key>GS</key>
+	<string>Satellite Count</string>
+	<key>BB</key>
+	<string>Bio Bay</string>
+</dict>
+</plist>
