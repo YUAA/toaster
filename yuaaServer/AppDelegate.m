@@ -333,6 +333,21 @@
     [akpsend showMe];
 }
 
+- (IBAction)gimmeMore:(id)sender {
+    NSData *d = [@"ST^600:1a" dataUsingEncoding:NSASCIIStringEncoding];
+    [currentSerialPort writeData:d error:NULL];
+}
+
+- (IBAction)gimme:(id)sender {
+    NSData *d = [@"ST^120:2f" dataUsingEncoding:NSASCIIStringEncoding];
+    [currentSerialPort writeData:d error:NULL];
+}
+
+- (IBAction)gimmeAll:(id)sender {
+    NSData *d = [@"ST^10800:43" dataUsingEncoding:NSASCIIStringEncoding];
+    [currentSerialPort writeData:d error:NULL];
+}
+
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification {
     NSInteger i = [sourceList selectedRow];
     if (i >= 0) {

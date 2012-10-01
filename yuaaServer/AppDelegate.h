@@ -64,6 +64,10 @@
 - (IBAction)changeLogView:(NSPopUpButtonCell *)sender;
 - (IBAction)showPrefs:(NSButton *)sender;
 - (IBAction)sendAKP:(id)sender;
+- (IBAction)gimme:(id)sender;
+- (IBAction)gimmeMore:(id)sender;
+- (IBAction)gimmeAll:(id)sender;
+
 
 @property (assign) IBOutlet NSWindow *window;
 
