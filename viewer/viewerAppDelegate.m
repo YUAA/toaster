@@ -99,8 +99,8 @@
 }
 
 -(void)gettingTags: (bool)b {
-    NSLog(@"Getting tags: %d", b);
-    NSLog(@"Statview controller is %@", statViewController);
+    // NSLog(@"Getting tags: %d", b);
+    // NSLog(@"Statview controller is %@", statViewController);
     [statViewController view];
     [statViewController setGettingTags: b];
 }

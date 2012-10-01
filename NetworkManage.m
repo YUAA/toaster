@@ -24,6 +24,11 @@
         
         NSSocketPort* serverSock = [[NSSocketPort alloc] initWithTCPPort: port];
         NSLog(@"Server socket is %d", [serverSock socket]);
+        
+        service = [[NSNetService alloc] initWithDomain:@"" type: @"_akp._tcp." name: @"AKPData" port: (int)port];
+        [service setDelegate: self];
+        [service publish];
+        
         // int set = 1;
         // setsockopt([serverSock socket], SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
         fileHandle = [[NSFileHandle alloc] initWithFileDescriptor: [serverSock socket]
@@ -40,7 +45,17 @@
     return self;
 }
 
+- (void)netServiceWillResolve:(NSNetService *)sender {
+    NSLog(@"Will resolve");
+}
 
+- (void)netService:(NSNetService *)sender didNotResolve:(NSDictionary *)errorDict {
+     NSLog(@"Couldn't resolve address!");
+}
+
+- (void)netServiceDidResolveAddress:(NSNetService *)sender {
+    NSLog(@"Resolving address!");
+}
 
 -(void)broadcast:(NSString *)s {
     NSData *d = [s dataUsingEncoding:NSUTF8StringEncoding];
@@ -55,6 +70,7 @@
 }
 
 - (void)recieveData: (NSData *)d {
+    NSLog(@"Recieved data with delegate %@", delegate);
     [delegate recieveData: d];
 }
 

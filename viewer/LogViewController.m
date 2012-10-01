@@ -18,7 +18,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        //
+        displaytype = 1;
     }
     return self;
 }
@@ -42,27 +42,28 @@
 }
 
 - (IBAction)logTypeChanged:(id)sender {
-    logData = NULL;
     NSInteger ind = ((UISegmentedControl *)sender).selectedSegmentIndex;
     if (ind == 2) {
+        displaytype = 2;
         [logTable setHidden: YES];
         [textView setHidden: NO];
     } else {
+        displaytype = 1;
         FlightData *f = [FlightData instance];
         logData = (ind == 0) ? f.parseLogData : f.netLogData;
         [logTable setHidden: NO];
-        [self reloadLog];
         [textView setHidden: YES];
+        [self reloadLog];
     }
     [self scroller];
 }
 
 - (void) scroller {
-    if (!logData) {
+    if (displaytype == 2) {
         NSRange range;
         range = NSMakeRange ([[textView text] length], 0);
         [textView scrollRangeToVisible: range];
-    } else {
+    } else if (displaytype == 1 && [logDataCopy count]) {
         if ([logDataCopy count]) {
         // [logTable performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
             [logTable scrollToRowAtIndexPath: [NSIndexPath indexPathForRow: [logDataCopy count] - 1 inSection: 0] atScrollPosition: UITableViewScrollPositionBottom animated:NO];
@@ -103,7 +104,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (logData) {
+    if (displaytype == 1) {
         logDataCopy = logData;
         return [logDataCopy count];
     } else {
@@ -121,12 +122,13 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
+        NSLog(@"Look up index %d", indexPath.row);
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
         [cell.textLabel setFont: [UIFont fontWithName: @"Arial" size:14]];
         [cell.textLabel setTextColor: [UIColor greenColor]];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    cell.textLabel.text = [logDataCopy objectAtIndex:indexPath.row];
+    cell.textLabel.text = [logData objectAtIndex:indexPath.row];
     return cell;
 }
 

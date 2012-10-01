@@ -17,16 +17,16 @@
 
 @class BalloonMapLogic;
 
-@interface Connector : NSObject <NSStreamDelegate> {
+@interface Connector : NSObject <NSStreamDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate> {
     id delegate;
     NSInputStream *mainstream;
     NSOutputStream *mainOutput;
-    bool erred;
+    bool connected;
     Prefs *prefs;
+    NSNetServiceBrowser *browser;
     Processor *processor;
 }
 
-- (void)retryConnectionWithStream:(NSInputStream *)stream;
 - (void)handleIO;
 - (void)ioThread;
 - (id)initWithProcessor: (Processor *)p prefs: (Prefs *)pr;

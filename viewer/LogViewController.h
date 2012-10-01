@@ -13,6 +13,7 @@
     UITableView *logTable;
     UITextView *textView;
     BOOL displayed;
+    int displaytype;
     NSArray *logData;
     NSArray *logDataCopy;
     id delegate;

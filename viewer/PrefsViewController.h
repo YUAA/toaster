@@ -9,13 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "Prefs.h"
 #import "PrefsResponder.h"
+#import "Connector.h"
 
-@interface PrefsViewController : UIViewController <UITextFieldDelegate> {
+@interface PrefsViewController : UIViewController <UITextFieldDelegate, NSNetServiceBrowserDelegate> {
     
     IBOutlet UISegmentedControl *mapView;
     IBOutlet UISegmentedControl *mapType;
-    IBOutlet UITextField *portField;
-    IBOutlet UITextField *localServerField;
     IBOutlet UITextField *postServerField;
     IBOutlet UITextField *deviceNameField;
     id <PrefsResponder> delegate;

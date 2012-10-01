@@ -11,7 +11,6 @@
 #import "AMSerialPort.h"
 #import "AMSerialPortList.h"
 #import "AMSerialPortAdditions.h"
-#import "Parser.h"
 #import "Processor.h"
 #import "PrefsPopupController.h"
 #import "ASIHTTPRequest.h"

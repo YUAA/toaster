@@ -20,11 +20,11 @@
 - (void)recieveData: (NSData *)d;
 @end
 
-@interface NetworkManage : NSObject {
+@interface NetworkManage : NSObject <NSNetServiceDelegate> {
 @private
     NSFileHandle *fileHandle;
     NSMutableArray *connections;
-    NSMutableArray *requests;
+     NSNetService *service;
     id<NetworkManageDelegate>delegate;
 }
 

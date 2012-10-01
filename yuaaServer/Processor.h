@@ -7,12 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Parser.h"
+// import "Parser.h"
 #import "Prefs.h"
 #import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
 #import "StatPoint.h"
 #import "FlightData.h"
+#import "cAkpParser.h"
 
 @protocol ProcessorDelegate
 @optional
@@ -34,7 +35,7 @@ char* formattedString(char* format, ...);
     BOOL threadAvailable;
     char cachedString[1024];
     int cacheStringIndex;
-    parserState pState;
+    TagParseData tpData;
     
     int bayCounter;
     Prefs *prefs;

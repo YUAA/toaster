@@ -25,13 +25,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    if (prefs.localServer != nil) {
-        localServerField.text = prefs.localServer;
-    }
-    if (prefs.port != 0) {
-        portField.text = [NSString stringWithFormat: @"%i", prefs.port];
-    }
     if (prefs.deviceName != nil) {
         deviceNameField.text = prefs.deviceName;
     }
@@ -45,8 +38,6 @@
     
     [deviceNameField release];
     [postServerField release];
-    [localServerField release];
-    [portField release];
     [mapType release];
     [mapView release];
     [super viewDidUnload];
@@ -66,17 +57,6 @@
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (textField == localServerField) {
-        prefs.localServer = localServerField.text;
-        [defaults setObject: prefs.localServer forKey:@"server"];
-    }
-    if (textField == portField) {
-        int a = [portField.text intValue];
-        if (a != 0) {
-            prefs.port = a;
-            [defaults setObject: [NSString stringWithFormat: @"%i", prefs.port] forKey:@"port"];
-        }
-    }
     if (textField == deviceNameField) {
         prefs.deviceName = deviceNameField.text;
         [defaults setObject: prefs.deviceName forKey:@"deviceName"];
@@ -107,9 +87,7 @@
 - (void)dealloc {
     [deviceNameField release];
     [postServerField release];
-    [localServerField release];
     self.prefs = nil;
-    [portField release];
     [mapType release];
     [mapView release];
     [super dealloc];

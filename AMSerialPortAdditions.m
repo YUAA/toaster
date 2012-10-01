@@ -328,8 +328,10 @@
 		if ((res >= 1) && (fileDescriptor >= 0)) {
 			bytesRead = read(fileDescriptor, localBuffer, AMSER_MAXBUFSIZE);
 		}
-		data = [NSData dataWithBytes:localBuffer length:bytesRead];
-		[delegate performSelectorOnMainThread:@selector(serialPortReadData:) withObject:[NSDictionary dictionaryWithObjectsAndKeys: self, @"serialPort", data, @"data", nil] waitUntilDone:NO];
+        if (bytesRead > 0) {
+            data = [NSData dataWithBytes:localBuffer length:bytesRead];
+            [delegate performSelectorOnMainThread:@selector(serialPortReadData:) withObject:[NSDictionary dictionaryWithObjectsAndKeys: self, @"serialPort", data, @"data", nil] waitUntilDone:NO];
+        }
 	} else {
 		[closeLock unlock];
 	}

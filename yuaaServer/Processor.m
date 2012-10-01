@@ -37,9 +37,8 @@ char* formattedString(char* format, ...)
 {
     self = [super init];
     if (self) {
-        prepCrc();
-        myUrl = [[NSURL URLWithString: @"http://yuaa.tc.yale.edu/scripts/raw.php"] retain];
-        storeUrl = [[NSURL URLWithString: @"http://yuaa.tc.yale.edu/scripts/store.php"] retain];
+        myUrl = [[NSURL URLWithString: @"http://yuaa.tc.yale.edu/yuaa/scripts/raw.php"] retain];
+        storeUrl = [[NSURL URLWithString: @"http://yuaa.tc.yale.edu/yuaa/scripts/store.php"] retain];
         prefs = [p retain];
         lastUpdate = [[NSDate date] retain];
         okToSend = 1;
@@ -56,8 +55,7 @@ char* formattedString(char* format, ...)
 }
 
 - (void) updateData: (char) c fromSerial: (int) fromSerial {
-    result *r = handle_char((char)c, &pState);
-    if (r) {
+    if (parseTag(c, &tpData)) {
         if (!gotTags) {
             if ([delegate respondsToSelector:@selector(gettingTags:)] && fromSerial) {
                 [delegate gettingTags: YES];
@@ -68,19 +66,19 @@ char* formattedString(char* format, ...)
         FlightData *flightData = [FlightData instance];
         [lastUpdate release];
         lastUpdate = [[NSDate date] retain];
-        if (cacheStringIndex + (r->length + 5) < 1024 && strncmp(r->tag, "IM", 2) != 0 && strncmp(r->tag, "LA", 2) != 0 && strncmp(r->tag, "LO", 2) != 0) {
-            NSLog(@"Updating with tag %2s", r->tag);
-            createProtocolMessage(cachedString + cacheStringIndex, r->tag, r->content, r->length);
-            cacheStringIndex += r->length + 5;
+        if (cacheStringIndex + (tpData.dataLength + 5) < 1024 && strncmp(tpData.tag, "IM", 2) != 0 && strncmp(tpData.tag, "LA", 2) != 0 && strncmp(tpData.tag, "LO", 2) != 0) {
+            NSLog(@"Updating with tag %2s", tpData.tag);
+            sendTagCellShield(cachedString + cacheStringIndex, tpData.tag, tpData.data);
+            cacheStringIndex += tpData.dataLength + 5;
         }
-        NSString *strTag = [[[NSString alloc] initWithBytes: r->tag length: 2 encoding:NSASCIIStringEncoding] autorelease];
+        NSString *strTag = [[[NSString alloc] initWithBytes: tpData.tag length: 2 encoding:NSASCIIStringEncoding] autorelease];
         NSLog(@"String tag is %@", strTag);
         if ([strTag isEqualToString: @"IM"]) {
             flightData.lastImageTime = [NSDate date];
             
             int width = 80;
             int height = 60;
-            Byte *rawImage = (Byte *)r->content;
+            Byte *rawImage = (Byte *)tpData.data;
             
             CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
             CGContextRef bitmapContext = CGBitmapContextCreate(
@@ -126,7 +124,7 @@ char* formattedString(char* format, ...)
             [imageData release];
             return;
         }
-        NSString *strVal = [[[NSString alloc] initWithBytes: r->content length: (NSUInteger)(r->length) encoding:NSASCIIStringEncoding] autorelease];
+        NSString *strVal = [[[NSString alloc] initWithBytes: tpData.data length: (NSUInteger)(tpData.dataLength) encoding:NSASCIIStringEncoding] autorelease];
         if ([strTag isEqualToString: @"MS"]) {
             [flightData.parseLogData addObject: @"Balloon message: "];
             [strVal enumerateLinesUsingBlock: ^(NSString *str, BOOL *stop) {
@@ -151,6 +149,7 @@ char* formattedString(char* format, ...)
                 flightData.lastIMUTime = [NSDate date];
             }
             else if (!([strTag isEqualToString: @"LA"] || [strTag isEqualToString: @"LO"] || [strTag isEqualToString: @"BB"])) {
+                NSLog(@"Doing some shit");
                 StatPoint *stat = [flightData.balloonStats objectForKey: strTag];
                 if (![flightData.balloonStats objectForKey: strTag]) {
                     [flightData.nameArray performSelectorOnMainThread:@selector(addObject:) withObject:strTag waitUntilDone:NO];    
@@ -239,9 +238,9 @@ didStartElement:(NSString *)elementName
     char *lonStr = formattedString("%f", f.lon);
     int lonLen = (int)strlen(lonStr);
     if ((cacheStringIndex + (latLen + 5) + (lonLen + 5)) < 1024) {
-        createProtocolMessage(cachedString + cacheStringIndex, "LA", latStr, latLen);
+        sendTagCellShield(cachedString + cacheStringIndex, "LA", latStr);
         cacheStringIndex += latLen + 5;
-        createProtocolMessage(cachedString + cacheStringIndex, "LO", lonStr, lonLen);
+        sendTagCellShield(cachedString + cacheStringIndex, "LO", lonStr);
         cacheStringIndex += lonLen + 5;
     }
     free(latStr);
@@ -250,10 +249,10 @@ didStartElement:(NSString *)elementName
 
 - (void)postTags {
     if ([lastUpdate timeIntervalSinceNow] < -10) {
-        NSLog(@"I am no longer getting tags");
+        // NSLog(@"I am no longer getting tags");
         if ([delegate respondsToSelector:@selector(gettingTags:)]) {
             [delegate gettingTags: NO];
-            NSLog(@"Delegate informed of no tags");
+            // NSLog(@"Delegate informed of no tags");
         }
         gotTags = NO;
         okToSend--;
@@ -277,7 +276,7 @@ didStartElement:(NSString *)elementName
     if (!gotTags && okToGet == 1) {
         okToSend--;
         okToGet--;
-        NSLog(@"Trying to get tags");
+        // NSLog(@"Trying to get tags");
         ASIFormDataRequest *r = [ASIFormDataRequest requestWithURL:myUrl];
         [r setPostValue: prefs.uuid forKey:@"uid"];
         [r setPostValue: @"balloon" forKey:@"devname"];
@@ -292,7 +291,7 @@ didStartElement:(NSString *)elementName
 }
 
 - (void) handleRequestFinished: (ASIHTTPRequest *) request {
-    NSLog(@"Request succeeded");
+    // NSLog(@"Request succeeded");
     //NSLog( @"Response is %@", [request responseString]);
     if ([delegate respondsToSelector: @selector(serverStatus:)])
         [delegate serverStatus: YES];

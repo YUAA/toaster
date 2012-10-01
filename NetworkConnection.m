@@ -33,6 +33,7 @@
         [(NetworkManage *)delegate closeConnection:self];
     } else {
         [(NetworkManage *)delegate recieveData: dat];
+        [fileHandle readInBackgroundAndNotify];
     }
 }
 

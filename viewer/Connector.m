@@ -19,7 +19,10 @@
     if (self) {
         processor = p;
         prefs = pr;
+        browser = [[NSNetServiceBrowser alloc] init];
+        [browser setDelegate: self];
         [NSThread detachNewThreadSelector: @selector(ioThread) toTarget: self withObject:nil];
+        connected = 0;
     }
     return self;
 }
@@ -30,6 +33,10 @@
     [[NSRunLoop currentRunLoop] run];
 }
 
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didNotSearch:(NSDictionary *)errorInfo {
+     NSLog(@"Didn't search");
+    [self handleIO];
+}
 
 - (void) dealloc {
     NSLog(@"Connector being deallocated");
@@ -51,69 +58,51 @@
 }
 
 - (void)handleIO {
-    NSLog(@"Handing IO");
-    if (self) NSLog(@"I exist");
-    if (self) {
-        CFHostRef host;
-        CFReadStreamRef readStream;
-        CFWriteStreamRef writeStream;
-        readStream = NULL;
-        
-        NSInputStream *inputStream;
-        NSOutputStream *outputStream;
-        
-        host = CFHostCreateWithName(NULL, (CFStringRef) prefs.localServer);
-        if (host != NULL) {
-            while (readStream == NULL || writeStream == NULL) {
-                (void) CFStreamCreatePairWithSocketToCFHost(kCFAllocatorDefault, host, prefs.port, &readStream, &writeStream);
-            }
-            NSLog(@"I made some streams");
-            CFRelease(host);
-            inputStream = (NSInputStream *)readStream;
-            outputStream = (NSOutputStream *)writeStream; 
-            [mainstream close];
-            [mainstream removeFromRunLoop:[NSRunLoop currentRunLoop]
-                                  forMode:NSDefaultRunLoopMode];
-            [mainstream release];
-            mainstream = inputStream;
-            [mainOutput close];
-            [mainOutput release];
-            mainOutput = outputStream;
-            [mainstream setDelegate:self];
-            [mainOutput setDelegate:self];
-            NSRunLoop *r = [NSRunLoop currentRunLoop];
-            [mainstream scheduleInRunLoop: r
-                                   forMode:NSDefaultRunLoopMode];
-            [mainstream open];
-            [mainOutput open];
-            NSLog(@"I opened some streams");
-        }
-    }
+    [browser searchForServicesOfType:@"_akp._tcp." inDomain:@""];
 }
 
 - (void)sendMessage:(NSString *)str {
     NSLog(@"I'm sending a message");
     NSStreamStatus status = [mainOutput streamStatus];
-    if (status == NSStreamStatusOpen || status == NSStreamStatusWriting)
-        [mainOutput write: [[str dataUsingEncoding: NSASCIIStringEncoding] bytes] maxLength: [str length]];
-}
-
-- (void)retryConnectionWithStream:(NSInputStream *)stream {
-    NSLog(@"I'm retrying the connection");
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    if ([stream streamError]) 
-        NSLog(@"Error: %@", [[stream streamError] localizedDescription]);
-    if (!erred) {
-        [[FlightData instance].netLogData addObject: @"Streaming Error. Trying again."];
-        erred = 1;
+    if ((status == NSStreamStatusOpen || status == NSStreamStatusWriting)) {
+        int e = [mainOutput write: [[str dataUsingEncoding: NSASCIIStringEncoding] bytes] maxLength: [str length]];
+        NSLog(@"Number of bits written: %d", e);
     }
-    [NSThread sleepForTimeInterval: 1];
-    [stream close];
-    [stream removeFromRunLoop:[NSRunLoop currentRunLoop]
-                      forMode:NSDefaultRunLoopMode];
-    [self handleIO];    
 }
 
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing {
+    NSLog(@"A service: %@", [netService name]);
+    if (!moreServicesComing && !connected) {
+        connected = 1;
+        NSLog(@"I found a service!");
+        [netService retain];
+        [netService setDelegate: self];
+        [netService resolveWithTimeout: 5];
+    }
+}
+
+- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)netServiceBrowser {
+    NSLog(@"Stopped search");
+    [self handleIO];
+}
+
+- (void)netServiceDidResolveAddress: (NSNetService *)sender {
+    NSLog(@"We resolved");
+    [mainstream close];
+    [mainstream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                          forMode:NSDefaultRunLoopMode];
+    [mainstream release];
+    [mainOutput close];
+    [mainOutput release];
+    [sender getInputStream: &mainstream outputStream: &mainOutput];
+    [mainstream setDelegate:self];
+    [mainOutput setDelegate:self];
+    [sender autorelease];
+    NSRunLoop *r = [NSRunLoop currentRunLoop];
+    [mainstream scheduleInRunLoop: r forMode:NSDefaultRunLoopMode];
+    [mainstream open];
+    [mainOutput open];
+}
 
 - (void)stream:(NSInputStream *)stream handleEvent:(NSStreamEvent)eventCode {
     NSLog(@"Something happened!");
@@ -122,13 +111,13 @@
             case NSStreamEventHasBytesAvailable: {
                 NSLog(@"Bytes are found!");
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-                erred = 0;
                 while ([stream hasBytesAvailable]) {
                     uint8_t readloc[256];
                     int len = [stream read:readloc maxLength:256];
-                    if (readloc[0] == 4 && readloc[1] == 4 && readloc[2] == 4) { // idk. i shouldn't need to do this
+                    if (readloc[0] == 4 && readloc[1] == 4 && readloc[2] == 4) {
+                        [stream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                                          forMode:NSDefaultRunLoopMode];
                         [stream close];
-                        [self retryConnectionWithStream: stream];
                         
                     } else {
                         NSString *toAppend = [[[NSString alloc] initWithBytes: readloc length: len encoding:NSASCIIStringEncoding] autorelease];
@@ -139,16 +128,6 @@
                             [processor updateData: readloc[i] fromSerial: 1];
                     }
                 }
-                break;
-            }
-            case NSStreamEventEndEncountered:
-            {
-                [self retryConnectionWithStream: stream];
-                break; 
-            }
-            case NSStreamEventErrorOccurred:
-            {
-                [self retryConnectionWithStream: stream];
                 break;
             }
             default:

@@ -23,7 +23,7 @@
         [postUrlCell setObjectValue: prefs.postServer];
     }
     if (prefs.port != 0) {
-        [serverPortCell setObjectValue: [NSString stringWithFormat: @"%i", prefs.port]];
+        [serverPortCell setObjectValue: [NSString stringWithFormat: @"%li", prefs.port]];
     }
     if (prefs.deviceName != nil) {
         [deviceIdCell setObjectValue: prefs.deviceName]; 

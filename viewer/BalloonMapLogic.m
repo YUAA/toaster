@@ -8,7 +8,7 @@
 
 #import "BalloonMapLogic.h"
 #include <math.h>
-#import "Parser.h"
+#import "cAkpParser.h"
 #import "ASIFormDataRequest.h"
 
 @implementation BalloonMapLogic
@@ -41,9 +41,11 @@
     [super dealloc];
 }
 
+/*
 - (void) mapView: (MKMapView *)map didUpdateUserLocation: (MKUserLocation *)userLocation {
     [self updateView];
 }
+ */
 
 - (void) postUserLocation {
     [self updateLoc];
@@ -55,11 +57,11 @@
         sprintf(lonstr,"%+.5f",coord.longitude);
         int latlen = strlen(latstr);
         int lonlen = strlen(lonstr);
-        char *lats = malloc(sizeof(char) * (latlen + 6));
-        char *lons = malloc(sizeof(char) * (lonlen + 6));
-        createProtocolMessage(lats,"LA", latstr, latlen);
-        createProtocolMessage(lons,"LO", lonstr, lonlen);
-        NSURL *myLocUrl = [NSURL URLWithString: [NSString stringWithFormat: @"http://yuaa.tc.yale.edu/scripts/store.php"]];
+        char *lats = malloc(sizeof(char) * (latlen + 7));
+        char *lons = malloc(sizeof(char) * (lonlen + 7));
+        sendTagCellShield(lats, "LA", latstr);
+        sendTagCellShield(lons,"LO", lonstr);
+        NSURL *myLocUrl = [NSURL URLWithString: [NSString stringWithFormat: @"http://yuaa.tc.yale.edu/yuaa/scripts/store.php"]];
         ASIFormDataRequest *locReq = [ASIFormDataRequest requestWithURL:myLocUrl];
         [locReq setPostValue: prefs.uuid forKey:@"uid"];
         [locReq setPostValue: @"berkeley" forKey: @"password"];
@@ -96,28 +98,30 @@ double myabs(double a) {
 }
 
 - (void)updateWithCurrentLocation:(CLLocationCoordinate2D)location {
-    DataPoint *p = [[DataPoint alloc] initWithCoordinate:location];
-    DataPoint *oldPoint = currentPoint;
-    currentPoint = p;    
-    if (oldPoint != nil) {
-        [map removeAnnotation:oldPoint];
-        [map addAnnotation:oldPoint];
+    if (fabs(location.latitude) <= 90 && fabs(location.longitude) <= 180) {
+        DataPoint *p = [[DataPoint alloc] initWithCoordinate:location];
+        DataPoint *oldPoint = currentPoint;
+        currentPoint = p;    
+        if (oldPoint != nil) {
+            [map removeAnnotation:oldPoint];
+            [map addAnnotation:oldPoint];
+        }
+        [map addAnnotation:p];
+        if ([oldPoints count] == 30) {
+            [transitionPoints addObject: currentPoint];
+        } else {
+            [oldPoints addObject: currentPoint];
+        }
+        if ([transitionPoints count] == 30) {
+            [map removeAnnotations: oldPoints];
+            NSMutableArray *temp;
+            temp = oldPoints;
+            [temp removeAllObjects];
+            oldPoints = transitionPoints;
+            transitionPoints = temp;
+        }
+        [self updateView];
     }
-    [map addAnnotation:p];
-    if ([oldPoints count] == 30) {
-        [transitionPoints addObject: currentPoint];
-    } else {
-        [oldPoints addObject: currentPoint];
-    }
-    if ([transitionPoints count] == 30) {
-        [map removeAnnotations: oldPoints];
-        NSMutableArray *temp;
-        temp = oldPoints;
-        [temp removeAllObjects];
-        oldPoints = transitionPoints;
-        transitionPoints = temp;
-    }
-    [self updateView];
 }
 
 -(void) updateView {
@@ -147,7 +151,8 @@ double myabs(double a) {
 }
 
 - (void) doUpdate {
-    [map setRegion: [map regionThatFits: currentRegion] animated:TRUE];
+    MKCoordinateRegion r = [map regionThatFits: currentRegion];
+    [map setRegion: r animated:TRUE];
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mV viewForAnnotation:(DataPoint *)annotation{
@@ -171,8 +176,10 @@ double myabs(double a) {
 
 - (void) updateLoc {
     FlightData *f = [FlightData instance];
-    CLLocationCoordinate2D loc = {f.lat, f.lon};
-    [self updateWithCurrentLocation: loc];
+    if (f.lat && f.lon) {
+        CLLocationCoordinate2D loc = {f.lat, f.lon};
+        [self updateWithCurrentLocation: loc];
+    }
 }
 
 

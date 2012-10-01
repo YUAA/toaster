@@ -51,9 +51,8 @@
     [FlightData instance];
     processor = [[Processor alloc] initWithPrefs: prefs];
     processor.delegate = self;
-    NSLog(@"Prefs.port is %ld", prefs.port);
-    if (prefs.port)
-        networkManager = [[NetworkManage alloc] initWithDelegate:self port: prefs.port];
+    if (!prefs.port) prefs.port = 9000;
+    networkManager = [[NetworkManage alloc] initWithDelegate:self port: prefs.port];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateConnections:) name:@"connectionUpdate" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rebuildPortList) name:AMSerialPortListDidAddPortsNotification object:nil];
@@ -103,12 +102,6 @@
             }
         }
     }
-}
-
-- (void) restartPort:(NSInteger)port {
-    NSLog(@"Restaring port");
-    [networkManager release];
-    networkManager = [[NetworkManage alloc] initWithDelegate:self port: port];
 }
 
 -(void)newConnection:(NetworkConnection *)conn {
@@ -244,7 +237,7 @@
                 body = [NSString stringWithFormat: @"Yaw: %.2f, Pitch: %.2f, Roll: %.2f",
                         f.rotationZ, f.rotationY, f.rotationX];
             } else if (rowIndex == 2) {
-                body = [NSString stringWithFormat: @"%d", [f.pictures count]];
+                body = [NSString stringWithFormat: @"%ld", [f.pictures count]];
                 updatedDate = f.lastImageTime;
             } else {
                 NSString *tag = [f.nameArray objectAtIndex:rowIndex -3];
@@ -393,13 +386,13 @@
     FlightData *f = [FlightData instance];
     if ([f.pictures count] <= ++imageIndex) imageIndex = 0;
     [imageView setImage: [f.pictures objectAtIndex: imageIndex]];
-    imageCounter.stringValue = [NSString stringWithFormat: @"%d of %d", imageIndex + 1, [f.pictures count]];
+    imageCounter.stringValue = [NSString stringWithFormat: @"%d of %ld", imageIndex + 1, [f.pictures count]];
 }
 - (IBAction)goRight:(id)sender {
     FlightData *f = [FlightData instance];
     if (--imageIndex < 0) imageIndex = (int)[f.pictures count] - 1;
     [imageView setImage: [f.pictures objectAtIndex: imageIndex]];
-    imageCounter.stringValue = [NSString stringWithFormat: @"%d of %d", imageIndex + 1, [f.pictures count]];
+    imageCounter.stringValue = [NSString stringWithFormat: @"%d of %ld", imageIndex + 1, [f.pictures count]];
 }
 
 - (void) updatePics {
