@@ -26,7 +26,7 @@
 
 char* formattedString(char* format, ...);
 
-@interface Processor : NSObject <NSXMLParserDelegate> {
+@interface Processor : NSObject {
     id delegate;
     
     int okToSend;

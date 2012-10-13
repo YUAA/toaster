@@ -23,7 +23,13 @@
         delegate = del;
         
         NSSocketPort* serverSock = [[NSSocketPort alloc] initWithTCPPort: port];
+        NSLog(@"Port was %ld", port);
+        while ([serverSock socket] == 0 && port < 9020) {
+            [serverSock release];
+            serverSock = [[NSSocketPort alloc] initWithTCPPort: ++port];
+        }
         NSLog(@"Server socket is %d", [serverSock socket]);
+        NSLog(@"Port is %ld", port);
         
         service = [[NSNetService alloc] initWithDomain:@"" type: @"_akp._tcp." name: @"AKPData" port: (int)port];
         [service setDelegate: self];

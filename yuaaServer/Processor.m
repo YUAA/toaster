@@ -37,8 +37,8 @@ char* formattedString(char* format, ...)
 {
     self = [super init];
     if (self) {
-        myUrl = [[NSURL URLWithString: @"http://yuaa.tc.yale.edu/yuaa/scripts/raw.php"] retain];
-        storeUrl = [[NSURL URLWithString: @"http://yuaa.tc.yale.edu/yuaa/scripts/store.php"] retain];
+        myUrl = [[NSURL URLWithString: @"http://yaleaerospace.com/scripts/raw.php"] retain];
+        storeUrl = [[NSURL URLWithString: @"http://yaleaerospace.com/scripts/store.php"] retain];
         prefs = [p retain];
         lastUpdate = [[NSDate date] retain];
         okToSend = 1;
@@ -167,10 +167,6 @@ char* formattedString(char* format, ...)
                 stat.lastTime = [NSDate date];
                 [stat.bayNumToPoints setObject:point forKey: [NSNumber numberWithInt:bayCounter]];
             } 
-            if ([strTag isEqualToString: @"MC"]) {mcc = (int)floor(floatVal); cellNew = YES; }
-            if ([strTag isEqualToString: @"MN"]) {mnc = (int)floor(floatVal); cellNew = YES; }
-            if ([strTag isEqualToString: @"CI"]) {cid = (int)floor(floatVal); cellNew = YES; }
-            if ([strTag isEqualToString: @"LC"]) {lac = (int)floor(floatVal); cellNew = YES; }
             if ([strTag isEqualToString: @"LA"] || [strTag isEqualToString: @"LO"]) {
                 double valAbs = fabs(floatVal);
                 double newVal = (((valAbs - floor(valAbs)) * 100) / 60 + floor(valAbs)) * (floatVal>0?1.0:-1.0);
@@ -186,48 +182,10 @@ char* formattedString(char* format, ...)
                     [delegate receivedLocation];
                 }
             }
-            if (mnc && mcc && cid && lac && cellNew && threadAvailable) {
-                cellNew = NO;
-                threadAvailable = NO;
-                NSURL *url = [NSURL URLWithString: [NSString stringWithFormat: @"http://www.opencellid.org/cell/get?key=f146d401108de36297356ce9d026c8c6&mnc=%d&mcc=%d&lac=%d&cellid=%d", mnc, mcc, lac, cid]];
-                [NSThread detachNewThreadSelector: @selector(updateWithURL:) toTarget:self withObject:url];
-            }
             if ([delegate respondsToSelector: @selector(receivedTag:withValue:)]) {
                 [delegate receivedTag: strTag withValue: floatVal];
             }
         }
-    }
-}
-
--(void)updateWithURL: (NSURL *)url {
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    [request startSynchronous];
-    NSError *error = [request error];
-    if (!error) {
-        NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[request responseData]];
-        [parser setDelegate: self];
-        [parser parse];
-        [parser release];
-        [FlightData instance].lastLocTime = [NSDate date];
-        [self addLocationToCache];
-        if ([delegate respondsToSelector:@selector(receivedLocation)])
-            [delegate receivedLocation];
-    }
-    threadAvailable = YES;
-}
-
-- (void)parser:(NSXMLParser *)parser
-didStartElement:(NSString *)elementName
-  namespaceURI:(NSString *)namespaceURI
- qualifiedName:(NSString *)qName
-    attributes:(NSDictionary *)dict
-{
-    if ([elementName isEqualToString: @"cell"]) {
-        // NSLog(@"Got location %@", dict);
-        FlightData *flightData = [FlightData instance];
-        flightData.lat = [[dict valueForKey: @"lat"] floatValue];
-        flightData.lon = [[dict valueForKey: @"lon"] floatValue];
-        // NSLog(@"Flightdata is %f, %f", flightData.lat, flightData.lon);
     }
 }
 
@@ -261,6 +219,7 @@ didStartElement:(NSString *)elementName
     if (gotTags && okToSend == 2) {
         if (cacheStringIndex > 0) {
             NSString *cache = [[[NSString alloc] initWithBytes: cachedString length: cacheStringIndex encoding:NSASCIIStringEncoding] autorelease];
+            NSLog(@"Cache is %@", cache);
             ASIFormDataRequest *r = [ASIFormDataRequest requestWithURL:storeUrl];
             [r setPostValue: prefs.uuid forKey:@"uid"];
             [r setPostValue: @"balloon" forKey:@"devname"];
@@ -282,6 +241,11 @@ didStartElement:(NSString *)elementName
         [r setPostValue: @"balloon" forKey:@"devname"];
         [r setDelegate:self];
         [r startAsynchronous];
+        ASIFormDataRequest *k = [ASIFormDataRequest requestWithURL:myUrl];
+        [k setPostValue: prefs.uuid forKey:@"uid"];
+        [k setPostValue: @"BalloonCell2" forKey:@"devname"];
+        [k setDelegate:self];
+        [k startAsynchronous];
     }
 }
 
@@ -292,7 +256,7 @@ didStartElement:(NSString *)elementName
 
 - (void) handleRequestFinished: (ASIHTTPRequest *) request {
     // NSLog(@"Request succeeded");
-    //NSLog( @"Response is %@", [request responseString]);
+    NSLog( @"Response is %@", [request responseString]);
     if ([delegate respondsToSelector: @selector(serverStatus:)])
         [delegate serverStatus: YES];
     FlightData *flightData = [FlightData instance];

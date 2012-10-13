@@ -61,7 +61,7 @@
         char *lons = malloc(sizeof(char) * (lonlen + 7));
         sendTagCellShield(lats, "LA", latstr);
         sendTagCellShield(lons,"LO", lonstr);
-        NSURL *myLocUrl = [NSURL URLWithString: [NSString stringWithFormat: @"http://yuaa.tc.yale.edu/yuaa/scripts/store.php"]];
+        NSURL *myLocUrl = [NSURL URLWithString: [NSString stringWithFormat: @"http://yaleaerospace.com/scripts/store.php"]];
         ASIFormDataRequest *locReq = [ASIFormDataRequest requestWithURL:myLocUrl];
         [locReq setPostValue: prefs.uuid forKey:@"uid"];
         [locReq setPostValue: @"berkeley" forKey: @"password"];

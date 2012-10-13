@@ -18,6 +18,7 @@
 @class BalloonMapLogic;
 
 @interface Connector : NSObject <NSStreamDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate> {
+    bool refreshMe;
     id delegate;
     NSInputStream *mainstream;
     NSOutputStream *mainOutput;

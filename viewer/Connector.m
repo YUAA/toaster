@@ -17,25 +17,29 @@
 {
     self = [self init];
     if (self) {
+        refreshMe = YES;
         processor = p;
         prefs = pr;
         browser = [[NSNetServiceBrowser alloc] init];
         [browser setDelegate: self];
-        [NSThread detachNewThreadSelector: @selector(ioThread) toTarget: self withObject:nil];
+        [NSThread detachNewThreadSelector: @selector(ioThread) toTarget:self withObject:nil];
+
         connected = 0;
     }
     return self;
 }
 
-
 - (void)ioThread {
-    [self handleIO];
+    [NSTimer scheduledTimerWithTimeInterval: 2 target: self selector:@selector(handleIO) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] run];
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didNotSearch:(NSDictionary *)errorInfo {
-     NSLog(@"Didn't search");
-    [self handleIO];
+    NSLog(@"didn't search: error %@", [errorInfo objectForKey: NSNetServicesErrorCode]);
+    //if ([[errorInfo objectForKey: NSNetServicesErrorCode] intValue] != NSNetServicesActivityInProgress) {
+    [netServiceBrowser stop];
+    refreshMe = YES;
+    // }
 }
 
 - (void) dealloc {
@@ -58,7 +62,10 @@
 }
 
 - (void)handleIO {
-    [browser searchForServicesOfType:@"_akp._tcp." inDomain:@""];
+    if (refreshMe) {
+        NSLog(@"About to refresh");
+        [browser searchForServicesOfType:@"_akp._tcp." inDomain:@""];
+    }
 }
 
 - (void)sendMessage:(NSString *)str {
@@ -71,7 +78,7 @@
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing {
-    NSLog(@"A service: %@", [netService name]);
+    NSLog(@"A service: %@ msc: %d, connected: %d", [netService name], moreServicesComing, connected);
     if (!moreServicesComing && !connected) {
         connected = 1;
         NSLog(@"I found a service!");
@@ -82,8 +89,8 @@
 }
 
 - (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)netServiceBrowser {
-    NSLog(@"Stopped search");
-    [self handleIO];
+    NSLog(@"stopped search");
+    refreshMe = YES;
 }
 
 - (void)netServiceDidResolveAddress: (NSNetService *)sender {
@@ -105,6 +112,7 @@
 }
 
 - (void)stream:(NSInputStream *)stream handleEvent:(NSStreamEvent)eventCode {
+    refreshMe = NO;
     NSLog(@"Something happened!");
     NSLog(@"Stream status is %d", [stream streamStatus]);
         switch(eventCode) {
@@ -118,6 +126,9 @@
                         [stream removeFromRunLoop:[NSRunLoop currentRunLoop]
                                           forMode:NSDefaultRunLoopMode];
                         [stream close];
+                        NSLog(@"Retrying to scan");
+                        connected = 0;
+                        refreshMe = YES;
                         
                     } else {
                         NSString *toAppend = [[[NSString alloc] initWithBytes: readloc length: len encoding:NSASCIIStringEncoding] autorelease];
@@ -131,6 +142,8 @@
                 break;
             }
             default:
+                connected = 0;
+                refreshMe = YES;
                 NSLog(@"Event code was %d", eventCode);
         }
 }
