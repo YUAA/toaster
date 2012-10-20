@@ -48,10 +48,18 @@ char* formattedString(char* format, ...);
     int lac;
     int cid;
     
+    NSThread *parsingThread;
+    
     BOOL gotTags;
     
     NSDate *lastUpdate;
 }
+
+@property (nonatomic, assign) NSThread *parsingThread;
+
+- (void)updateFromWeb:(NSData *)responseData;
+- (void)updateFromSerialWithData:(NSData *)data;
+
 
 - (void)addLocationToCache;
 - (void)updateData: (char) c fromSerial: (int) fromSerial;

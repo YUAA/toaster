@@ -52,26 +52,33 @@
     processor = [[Processor alloc] initWithPrefs: prefs];
     processor.delegate = self;
     if (!prefs.port) prefs.port = 9000;
-    networkManager = [[NetworkManage alloc] initWithDelegate:self port: prefs.port];
+    
+    //networkManager = [[NetworkManage alloc] initWithDelegate:self port: prefs.port];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateConnections:) name:@"connectionUpdate" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rebuildPortList) name:AMSerialPortListDidAddPortsNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rebuildPortList) name:AMSerialPortListDidRemovePortsNotification object:nil];
+    
+    
     popOver = [[NSPopover alloc] init];
     portList = prefsViewController.serialPortCell;
     akpsend = [[AKPSender alloc] initWithNibName:@"AKPSender" bundle:nil];
     popOver.behavior = NSPopoverBehaviorSemitransient;
+    
     [self rebuildPortList];
-    [self restartSerial: [portList selectedItem].title];
+    //[self restartSerial: [portList selectedItem].title];
+    
     [NSThread detachNewThreadSelector: @selector(defibrillator) toTarget:self withObject:nil];
     graphLogic = [[GraphLogic alloc] initWithGraphView: graphHostingView];
     
-    NSString *mapString = [[NSBundle mainBundle] pathForResource:@"map" ofType:@"html"];
-    NSURL *mapFileURL = [NSURL URLWithString:mapString];
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:mapFileURL]];
-    [[[webView mainFrame] frameView] setAllowsScrolling:NO];
-    [webView setNeedsDisplay:YES];
-    currentView = webView;
+    
+    //NSString *mapString = [[NSBundle mainBundle] pathForResource:@"map" ofType:@"html"];
+    //NSURL *mapFileURL = [NSURL URLWithString:mapString];
+    //[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:mapFileURL]];
+    //[[[webView mainFrame] frameView] setAllowsScrolling:NO];
+    
+    //[webView setNeedsDisplay:YES];
+    //currentView = webView;
 }
 
 -(void)restartSerial:(NSString *)port {
@@ -87,7 +94,7 @@
         for (AMSerialPort *s in a) {
             //NSLog(@"S: %@",s);
             if ([[s description] rangeOfString:port].length != 0) {
-                NSLog(@"Connecting to Arduino");
+                NSLog(@"Connecting to Arduino: %@", port);
                 currentSerialPort = [s retain];
                 [currentSerialPort setDelegate:self];
                 if (![currentSerialPort open]) {
@@ -143,13 +150,18 @@
 }
 
 -(void)rebuildPortList {
+    NSLog(@"Rebuilding Ports List");
     [portList removeAllItems];
     NSArray *a = [[AMSerialPortList sharedPortList] serialPorts];
-    
+    NSString *autoconnectname = nil;
     for (int i=0;i<[a count];i++) {
-        [portList addItemWithTitle:[(AMSerialPort *)[a objectAtIndex:i] name]];
+        NSString *name = [(AMSerialPort *)[a objectAtIndex:i] name];
+        [portList addItemWithTitle:name];
+        if ([name rangeOfString:@"usbserial"].length != 0) autoconnectname = name;
     }
     [portList addItemWithTitle: @"Test Data"];
+    NSLog(@"Autoconnecting: %@", autoconnectname);
+    if (!currentSerialPort && autoconnectname != nil) [self restartSerial:autoconnectname];
 }
 
 - (void)serialPortReadData:(NSDictionary *)dDictionary {
@@ -157,21 +169,24 @@
 	NSData *d = [dDictionary valueForKey:@"data"];
     [networkManager writeData:d];
     NSString *str = [[[NSString alloc] initWithData: d encoding:NSASCIIStringEncoding] autorelease];
-    const char *d_unsafe = [d bytes];
+    //const char *d_unsafe = [d bytes];
     [log writeData: d];
     NSAttributedString *attr = [[[NSAttributedString alloc] initWithString: str] autorelease];
     [[textForLog textStorage] performSelectorOnMainThread:@selector(appendAttributedString:) withObject:attr waitUntilDone:YES];
     [self performSelectorOnMainThread:@selector(scroller) withObject:nil waitUntilDone:NO];
-    [lastUpdate autorelease];
+    [lastUpdate release];
     lastUpdate = [[NSDate date] retain];
-    int i;
-    for (i=0; i < [d length]; i++) {
-            [processor updateData: *(d_unsafe+i) fromSerial: 1];
-    }
+    
+    [processor performSelector:@selector(updateFromSerialWithData:) onThread:processor.parsingThread withObject:d waitUntilDone:NO];
+    
     [port readDataInBackground];
 }
 
 - (void)parseDemoFile {
+    
+    // SAM NEEDS TO FIX THIS
+    
+    
     NSLog(@"Starting demo");
     const char *filePath = [[[NSBundle mainBundle] pathForResource: @"demo" ofType: nil] cStringUsingEncoding:NSASCIIStringEncoding];
     FILE *p = fopen(filePath, "r");
@@ -181,7 +196,7 @@
     while (!feof(p) && !currentSerialPort) {
         c = fgetc(p);
         [processor updateData: c fromSerial: 0];
-        [lastUpdate autorelease];
+        [lastUpdate release];
         lastUpdate = [[NSDate date] retain];
         buffer[i++] = c;
         if (i == 1023) {

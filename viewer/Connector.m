@@ -134,9 +134,10 @@
                         NSString *toAppend = [[[NSString alloc] initWithBytes: readloc length: len encoding:NSASCIIStringEncoding] autorelease];
                         NSLog(@"Connector is calling delegate %@", delegate);
                         [delegate gotAkpString: toAppend];
-                        int i;
-                        for (i=0; i < len; i++)
-                            [processor updateData: readloc[i] fromSerial: 1];
+                        // int i;
+                        //for (i=0; i < len; i++) [processor updateData: readloc[i] fromSerial: 1];
+                        NSData *data = [NSData dataWithBytes:readloc length:len];
+                        [processor performSelector:@selector(updateFromSerialWithData:) onThread:processor.parsingThread withObject:data waitUntilDone:NO];
                     }
                 }
                 break;

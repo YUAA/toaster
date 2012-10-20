@@ -522,6 +522,7 @@ typedef struct {
 } VertexTextureIndex;
 static inline VertexTextureIndex * VertexTextureIndexMake (GLuint inVertex, GLuint inTextureCoords, GLuint inActualVertex)
 {
+    NSLog("Malloccing Texture");
 	VertexTextureIndex *ret = malloc(sizeof(VertexTextureIndex));
 	ret->originalVertex = inVertex;
 	ret->textureCoords = inTextureCoords;

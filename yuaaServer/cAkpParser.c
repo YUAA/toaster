@@ -105,10 +105,21 @@ bool addByteForNormalTag(char currentByte, TagParseData* tpData)
             {
                 //We have successfully parsed a tag!
                 //So we make malloc-ments for output!
+                
+                //printf("Mallocing Tag %zi\n",3);
+                
                 tpData->tag = exitmalloc(3);
                 strncpy(tpData->tag, tagBytes, 3);
                 
+                
+                //printf("Mallocing Data %zi\n",tpData->dataLength);
+                
+                
+                
+                
+                
                 tpData->dataLength = tpData->dataIndex;
+                
                 tpData->data = exitmalloc(tpData->dataLength);
                 strncpy(tpData->data, tpData->dataBuffer, tpData->dataLength);
                 
@@ -119,6 +130,7 @@ bool addByteForNormalTag(char currentByte, TagParseData* tpData)
                 tpData->data[tpData->dataLength] = '\0';
                 
                 //Reset the fact that we were in a tag
+                //printf("No longer in a tag\n");
                 tpData->dataIndex = -1;
                 
                 return true;
@@ -127,6 +139,7 @@ bool addByteForNormalTag(char currentByte, TagParseData* tpData)
     }
     //If something fell through, then we had some failure,
     //so we abort by setting the tag as not yet found
+    //printf("Something had a failure\n");
     tpData->dataIndex = -1;
     return false;
 }
@@ -146,6 +159,7 @@ void finalizeDdTag(TagParseData* tpData)
     memcpy(tpData->data, tpData->dataBuffer, tpData->dataLength);
     
     //Reset our presence in any ongoing tag
+    //printf("Completed a dd tag\n");
     tpData->lengthByteOn = -1;
     tpData->dataIndex = -1;
 }
@@ -193,6 +207,7 @@ bool addByteForDdTag(char currentByte, TagParseData* tpData)
                     }
                     
                     //Good to start getting that data
+                    //printf("starting to get\n");
                     tpData->dataIndex = 0;
                     return false;
                 }
@@ -220,6 +235,7 @@ bool addByteForDdTag(char currentByte, TagParseData* tpData)
     //If we have fallen through then we have an error in the parsing,
     //so we abort the DD tag and set is as not found yet
     //we must also reset the data index to show that we are not in a normal tag either
+    //printf("Another error in parsing\n");
     tpData->lengthByteOn = -1;
     tpData->dataIndex = -1;
     return false;
@@ -244,6 +260,7 @@ bool parseTag(char currentByte, TagParseData* tpData)
         tpData->currentByte = -1;
         tpData->tagByte1 = -1;
         tpData->tagByte2 = -1;
+        printf("Init\n");
         tpData->dataIndex = -1;
         tpData->bufferLength = 32;
         tpData->dataBuffer = exitmalloc(tpData->bufferLength);
@@ -272,7 +289,7 @@ bool parseTag(char currentByte, TagParseData* tpData)
         tpData->tagByte1 = tpData->previousByte1;
         tpData->tagByte2 = tpData->previousByte2;
         
-        if (tpData->tagByte1 == 'D' && tpData->tagByte2 == 'D')
+        if (tpData->tagByte1 == 'D' && tpData->tagByte2 == 'D' && 0)
         {
             //Start getting length bytes for the arbitrary data
             tpData->lengthByteOn = 0;
@@ -282,10 +299,12 @@ bool parseTag(char currentByte, TagParseData* tpData)
         else
         {
             //Start collecting data
+            //printf("Starting to collect\n");
             tpData->dataIndex = 0;
             
             //Mark remaining needed parts as not found yet
             tpData->hasColon = false;
+            //printf("Not found yet\n");
             tpData->checkByte1 = -1;
             tpData->checkByte2 = -1;
         }

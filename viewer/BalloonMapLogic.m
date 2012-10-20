@@ -57,8 +57,10 @@
         sprintf(lonstr,"%+.5f",coord.longitude);
         int latlen = strlen(latstr);
         int lonlen = strlen(lonstr);
+        
         char *lats = malloc(sizeof(char) * (latlen + 7));
         char *lons = malloc(sizeof(char) * (lonlen + 7));
+        
         sendTagCellShield(lats, "LA", latstr);
         sendTagCellShield(lons,"LO", lonstr);
         NSURL *myLocUrl = [NSURL URLWithString: [NSString stringWithFormat: @"http://yaleaerospace.com/scripts/store.php"]];
@@ -69,6 +71,9 @@
         [locReq setPostValue: [NSString stringWithFormat: @"%s%s", lats, lons] forKey: @"data"];
         [locReq setDelegate:self];
         [locReq startAsynchronous];
+        
+        free(lats);
+        free(lons);
     }
 }
 

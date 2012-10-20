@@ -37,6 +37,7 @@
         
         // int set = 1;
         // setsockopt([serverSock socket], SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+        NSLog(@"Allocating Network");
         fileHandle = [[NSFileHandle alloc] initWithFileDescriptor: [serverSock socket]
                                                      closeOnDealloc: YES];
         // [fileHandle retain];
