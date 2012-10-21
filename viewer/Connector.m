@@ -128,11 +128,13 @@
     NSLog(@"Stream status is %d", [stream streamStatus]);
         switch(eventCode) {
             case NSStreamEventHasBytesAvailable: {
+                /*
                 if (disconnectTimer) {
                     [disconnectTimer invalidate];
                     [disconnectTimer release];
                 }
                 disconnectTimer = [[NSTimer scheduledTimerWithTimeInterval: 8 target:self selector:@selector(disconnect:) userInfo:nil repeats:NO] retain];
+                */
                 NSLog(@"Bytes are found!");
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 while ([stream hasBytesAvailable]) {

@@ -35,12 +35,16 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    NSString *path= @"~/Library/Logs/YUAA.log";
+    NSString *home = NSHomeDirectory();
+    NSString *path= [home stringByAppendingPathComponent: @"Library/Logs/YUAA.log"];
     NSFileManager *fm = [NSFileManager defaultManager];
+    
     if (![fm isWritableFileAtPath: path]) {
         [fm createFileAtPath: path contents: [NSData data] attributes: nil];
     }
     log = [[NSFileHandle fileHandleForUpdatingAtPath: path] retain];
+    NSLog(@"Log is %@,", log);
+    
     
     prefsViewController = [[PrefsPopupController alloc] initWithNibName:@"PrefsPopupController" bundle:nil];
     [prefsViewController view];
@@ -49,7 +53,11 @@
     prefsViewController.delegate = self;
     [prefsViewController view];
     [FlightData instance];
+    
     processor = [[Processor alloc] initWithPrefs: prefs];
+    
+    return;
+    
     processor.delegate = self;
     if (!prefs.port) prefs.port = 9000;
     

@@ -28,8 +28,15 @@
         localServer = [defaults stringForKey: @"server"];
         port = [defaults integerForKey: @"port"];
         deviceName = [defaults stringForKey: @"deviceName"];
+        #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+        if (!deviceName) deviceName = [[[UIDevice currentDevice] name] retain];
+        NSLog(@"Device name is %@", deviceName);
+        #else  
+         if (!deviceName) deviceName = [[[NSHost currentHost] localizedName] retain];
+        #endif
         autoAdjust = (int)[defaults integerForKey: @"autoAdjust"];
         postServer = [defaults stringForKey: @"postServer"];
+
     }
     return self;
 }

@@ -11,7 +11,7 @@
 @implementation viewerAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
     prefs = [[Prefs alloc] init];
     prefsViewController.prefs = prefs;
     prefsViewController.delegate = self;

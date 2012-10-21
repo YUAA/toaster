@@ -12,6 +12,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
     oldString = [[NSMutableString alloc] initWithCapacity: 1024];
     prefs = [[Prefs alloc] init];
     prefsViewController.prefs = prefs;

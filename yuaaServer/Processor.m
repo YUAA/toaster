@@ -44,10 +44,10 @@ char* formattedString(char* format, ...)
         lastUpdate = [[NSDate date] retain];
         netBusy = 0;
         threadAvailable = 1;
-        [NSThread detachNewThreadSelector: @selector(posterThread) toTarget:self withObject:nil];
+        //[NSThread detachNewThreadSelector: @selector(posterThread) toTarget:self withObject:nil];
         
-        parsingThread = [[NSThread alloc] initWithTarget:self selector:@selector(runParseThread) object:nil];
-        [parsingThread start];
+        //parsingThread = [[NSThread alloc] initWithTarget:self selector:@selector(runParseThread) object:nil];
+        //[parsingThread start];
         
         
     }
@@ -131,6 +131,8 @@ char* formattedString(char* format, ...)
 
 - (void) updateData: (char) c fromSerial: (int) fromSerial withId: (NSString *)ID {
     
+    //return;
+    
     if (parseTag(c, &tpData)) {
         
         if (!gotTags) {
@@ -148,12 +150,12 @@ char* formattedString(char* format, ...)
         
         
         // Not image, not LA, not LO
-        if (cacheStringIndex + (tpData.dataLength + 5) < 1024 && strncmp(tpData.tag, "IM", 2) != 0 && strncmp(tpData.tag, "LA", 2) != 0 && strncmp(tpData.tag, "LO", 2) != 0) {
+        if (cacheStringIndex + (tpData.dataLength + 6) < 1024 && strncmp(tpData.tag, "IM", 2) != 0 && strncmp(tpData.tag, "LA", 2) != 0 && strncmp(tpData.tag, "LO", 2) != 0) {
             //Update the Cache to send to the server
             NSLog(@"Updating with tag %2s", tpData.tag);
             // Calculate the tag...
             sendTagCellShield(cachedString + cacheStringIndex, tpData.tag, tpData.data);
-            cacheStringIndex += tpData.dataLength + 5;
+            cacheStringIndex += tpData.dataLength + 6;
         }
         
         
@@ -251,17 +253,22 @@ char* formattedString(char* format, ...)
         else if ([strTag isEqualToString: @"LA"] || [strTag isEqualToString: @"LO"]) {
             double valAbs = fabs(floatVal);
             double newVal = (((valAbs - floor(valAbs)) * 100) / 60 + floor(valAbs)) * (floatVal>0?1.0:-1.0);
-            if ([strTag isEqualToString: @"LA"]) {
-                flightData.lat = newVal;
-                flightData.lastLocTime = [NSDate date];
-            } else if ([strTag isEqualToString: @"LO"]) {
-                flightData.lon = newVal;
-                flightData.lastLocTime = [NSDate date];
-            }
-            if (flightData.lat && flightData.lon) {
-                [self addLocationToCache];
-                if ([delegate respondsToSelector:@selector(gettingTags:)])
-                    [delegate receivedLocationForId: ID];
+            
+            if (valAbs != 0) {
+            
+                if ([strTag isEqualToString: @"LA"]) {
+                    flightData.lat = newVal;
+                    flightData.lastLocTime = [NSDate date];
+                } else if ([strTag isEqualToString: @"LO"]) {
+                    flightData.lon = newVal;
+                    flightData.lastLocTime = [NSDate date];
+                }
+                if (flightData.lat && flightData.lon) {
+                    [self addLocationToCache];
+                    if ([delegate respondsToSelector:@selector(gettingTags:)])
+                        [delegate receivedLocationForId: ID];
+                }
+                
             }
         }
         else if ([strTag isEqualToString: @"BB"]) {
@@ -310,11 +317,11 @@ char* formattedString(char* format, ...)
     int latLen = (int)strlen(latStr);
     char *lonStr = formattedString("%f", f.lon);
     int lonLen = (int)strlen(lonStr);
-    if ((cacheStringIndex + (latLen + 5) + (lonLen + 5)) < 1024) {
+    if ((cacheStringIndex + (latLen + 6) + (lonLen + 6)) < 1024) {
         sendTagCellShield(cachedString + cacheStringIndex, "LA", latStr);
-        cacheStringIndex += latLen + 5;
+        cacheStringIndex += latLen + 6;
         sendTagCellShield(cachedString + cacheStringIndex, "LO", lonStr);
-        cacheStringIndex += lonLen + 5;
+        cacheStringIndex += lonLen + 6;
     }
     free(latStr);
     free(lonStr);
@@ -330,24 +337,29 @@ char* formattedString(char* format, ...)
         gotTags = NO;
     }
     
-    // Uplink
+    // return;
+    
+    // Uplink and downlink
     if (netBusy == 0) {
         if (cacheStringIndex > 0) {
             netBusy++;
-            NSString *cache = [[[NSString alloc] initWithBytes: cachedString length: cacheStringIndex encoding:NSASCIIStringEncoding] autorelease];
+            NSString *cache = [[NSString alloc] initWithBytes: cachedString length: cacheStringIndex encoding:NSASCIIStringEncoding];
             NSLog(@"Cache is %@", cache);
             ASIFormDataRequest *r = [ASIFormDataRequest requestWithURL:storeUrl];
-            [r setPostValue: prefs.uuid forKey:@"uid"];
+            NSLog(@"Posting with devname: %@", prefs.deviceName);
+            [r setPostValue: prefs.deviceName forKey:@"uid"];
             [r setPostValue: @"balloon" forKey:@"devname"];
             [r setPostValue: cache forKey: @"data"];
             [r setDelegate:self];
             cacheStringIndex = 0;
             NSLog(@"Putting tags on server");
             [r startAsynchronous];
+            [cache release];
         }
         // Load Raw.php and obtain data for all devices
         ASIFormDataRequest *k = [ASIFormDataRequest requestWithURL:myUrl];
-        [k setPostValue: prefs.uuid forKey:@"uid"];
+        NSLog(@"Getting with devname: %@", prefs.deviceName);
+        [k setPostValue: prefs.deviceName forKey:@"uid"];
         [k setDelegate:self];
         netBusy++;
         [k startAsynchronous];

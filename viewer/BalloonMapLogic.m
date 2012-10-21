@@ -71,14 +71,14 @@
         int latlen = strlen(latstr);
         int lonlen = strlen(lonstr);
         
-        char *lats = malloc(sizeof(char) * (latlen + 7));
-        char *lons = malloc(sizeof(char) * (lonlen + 7));
+        char *lats = calloc((latlen + 7), sizeof(char));
+        char *lons = calloc((lonlen + 7), sizeof(char));
         
         sendTagCellShield(lats, "LA", latstr);
         sendTagCellShield(lons,"LO", lonstr);
         NSURL *myLocUrl = [NSURL URLWithString: [NSString stringWithFormat: @"http://yaleaerospace.com/scripts/store.php"]];
         ASIFormDataRequest *locReq = [ASIFormDataRequest requestWithURL:myLocUrl];
-        [locReq setPostValue: prefs.uuid forKey:@"uid"];
+        [locReq setPostValue: prefs.deviceName forKey:@"uid"];
         [locReq setPostValue: @"berkeley" forKey: @"password"];
         [locReq setPostValue: [prefs deviceName] forKey:@"devname"];
         [locReq setPostValue: [NSString stringWithFormat: @"%s%s", lats, lons] forKey: @"data"];
