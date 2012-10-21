@@ -11,6 +11,17 @@
 #import "cAkpParser.h"
 #import "ASIFormDataRequest.h"
 
+
+#define MAX_BALLOON_POINT_HISTORY 30
+#define MAX_CELL_TRIANGULATION_HISTORY 30
+#define MAX_CHASE_HISTORY 1
+#define MAX_CELL_TOWER_HISTORY 30
+
+#define BALLOON_POINT_KEY @"balloon"
+#define BALLOON_POINT_CELL_KEY @"balloon_cell"
+#define CHASE_KEY @"chase"
+#define TOWER_KEY @"tower"
+
 @implementation BalloonMapLogic
 @synthesize okToUpdate;
 
@@ -21,8 +32,10 @@
         map = [m retain];
         [map setDelegate: self];
         map.showsUserLocation = YES;
-        oldPoints = [[NSMutableArray alloc] initWithCapacity: 30];
-        transitionPoints = [[NSMutableArray alloc] initWithCapacity: 30];
+
+        dataPointHistory = [[NSMutableDictionary alloc] init];
+        
+        
         [self updateView];
         [NSThread detachNewThreadSelector:@selector(poster) toTarget:self withObject:nil];
     }
@@ -35,6 +48,7 @@
 }
 
 - (void) dealloc {
+    [dataPointHistory release];
     [currentPoint release];
     [map release];
     [prefs release];
@@ -48,7 +62,6 @@
  */
 
 - (void) postUserLocation {
-    [self updateLoc];
     char latstr[20];
     char lonstr[20];
     CLLocationCoordinate2D coord = map.userLocation.location.coordinate;
@@ -102,31 +115,58 @@ double myabs(double a) {
     return rect.latitudeDelta * rect.longitudeDelta;
 }
 
-- (void)updateWithCurrentLocation:(CLLocationCoordinate2D)location {
-    if (fabs(location.latitude) <= 90 && fabs(location.longitude) <= 180) {
-        DataPoint *p = [[DataPoint alloc] initWithCoordinate:location];
-        DataPoint *oldPoint = currentPoint;
-        currentPoint = p;    
-        if (oldPoint != nil) {
-            [map removeAnnotation:oldPoint];
-            [map addAnnotation:oldPoint];
+- (void)updateLocation:(CLLocationCoordinate2D)location forIdentifier:(NSString *)ID {
+    //Create a new data point for the balloon
+    DataPoint *newPoint = [[DataPoint alloc] initWithCoordinate:location];
+    newPoint.ID = ID;
+    
+    
+    //Choose the data type based on the ID
+    
+    int maxHistory = 0;
+    NSString *historyType = nil;
+    
+    if ([ID isEqualToString:@"balloon"]) {
+        if (currentPoint) {
+            currentPoint.type = kDataPointTypeBalloon;
+            [map removeAnnotation: currentPoint];
+            [map addAnnotation: currentPoint];
         }
-        [map addAnnotation:p];
-        if ([oldPoints count] == 30) {
-            [transitionPoints addObject: currentPoint];
-        } else {
-            [oldPoints addObject: currentPoint];
-        }
-        if ([transitionPoints count] == 30) {
-            [map removeAnnotations: oldPoints];
-            NSMutableArray *temp;
-            temp = oldPoints;
-            [temp removeAllObjects];
-            oldPoints = transitionPoints;
-            transitionPoints = temp;
-        }
+        newPoint.type = kDataPointTypeBalloonCurrent;
+        currentPoint = newPoint;
+        historyType = BALLOON_POINT_KEY;
+        maxHistory = MAX_BALLOON_POINT_HISTORY;
+        
         [self updateView];
+    } else if ([ID isEqualToString:@"BalloonCell"]) {
+        newPoint.type = kDataPointTypeCellTriangulation;
+        historyType = BALLOON_POINT_CELL_KEY;
+        maxHistory = MAX_CELL_TRIANGULATION_HISTORY;
+    } else if ([ID isEqualToString:@"Tower"]) {
+        newPoint.type = kDataPointTypeCellTower;
+        historyType = TOWER_KEY;
+        maxHistory = MAX_CELL_TOWER_HISTORY;
+    } else {
+        newPoint.type = kDataPointTypeChaseCar;
+        historyType = CHASE_KEY;
+        maxHistory = MAX_CHASE_HISTORY;
     }
+    
+    // Grab the history of balloon data points - depending on whether the points were for cell or from the GPS
+    NSMutableArray *previousPoints = [dataPointHistory objectForKey:historyType];
+    if (previousPoints == nil) {
+        previousPoints = [[NSMutableArray alloc] init];
+        [dataPointHistory setObject:previousPoints forKey:historyType];
+    }
+    
+    if ([previousPoints count] >= maxHistory) {
+        //Too many points - remove the last data point, and annotation from the map
+        DataPoint *removePoint = [previousPoints objectAtIndex:0];
+        [previousPoints removeObjectAtIndex:0];
+        [map removeAnnotation:removePoint];
+    }
+    [previousPoints addObject:newPoint];
+    [map addAnnotation:newPoint];
 }
 
 -(void) updateView {
@@ -161,29 +201,88 @@ double myabs(double a) {
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mV viewForAnnotation:(DataPoint *)annotation{
-    static NSString *defaultAnnotationID = @"datapoint";
+    static NSString *PinIdentifier = @"pinview";
+    static NSString *TowerIdentifier = @"tower";
+    static NSString *ChaseIdentifier = @"chase";
+    
     
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
     
-    MKPinAnnotationView *annotationView = (MKPinAnnotationView *)[map dequeueReusableAnnotationViewWithIdentifier:defaultAnnotationID];
-    if (annotationView == nil) {
-        annotationView = [[[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:defaultAnnotationID] autorelease];
-        annotationView.canShowCallout = YES;
-        annotationView.calloutOffset = CGPointMake(-5, 5);
-    } else {
-        annotationView.annotation = annotation;
+    
+    MKAnnotationView *annotationView;
+    
+    // Choose an Annotation View for the map
+    switch (annotation.type) {
+        case kDataPointTypeBalloon:
+        case kDataPointTypeBalloonCurrent:
+        case kDataPointTypeCellTriangulation:
+            annotationView = (MKPinAnnotationView *)[map dequeueReusableAnnotationViewWithIdentifier:PinIdentifier];
+            [(MKPinAnnotationView *)annotationView setAnimatesDrop: NO];
+            if (annotationView == nil) {
+                annotationView = [[[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:PinIdentifier] autorelease];
+                annotationView.canShowCallout = YES;
+                annotationView.calloutOffset = CGPointMake(-5, 5);
+            } else {
+                annotationView.annotation = annotation;
+            }
+            [(MKPinAnnotationView *)annotationView setPinColor:MKPinAnnotationColorRed];
+        
+            // In the case of the point being the CURRENT position, just switch the pin color to green
+            if (annotation.type == kDataPointTypeBalloonCurrent) {
+                [(MKPinAnnotationView *)annotationView setPinColor:MKPinAnnotationColorGreen];
+                currentBalloonPin = (MKPinAnnotationView *)annotationView;
+            }
+            
+            if (annotation.type == kDataPointTypeCellTriangulation) [(MKPinAnnotationView *)annotationView setPinColor:MKPinAnnotationColorPurple];
+            
+            break;
+        case kDataPointTypeChaseCar:
+            annotationView = [map dequeueReusableAnnotationViewWithIdentifier:ChaseIdentifier];
+            if (annotationView == nil) {
+                annotationView = [[[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:ChaseIdentifier] autorelease];
+                annotationView.image  = [UIImage imageNamed:@"chase.png"];
+                annotationView.canShowCallout = YES;
+                annotationView.calloutOffset = CGPointMake(-5, 5);
+            } else {
+                annotationView.annotation = annotation;
+            }
+            break;
+            
+        case kDataPointTypeCellTower:
+            annotationView = [map dequeueReusableAnnotationViewWithIdentifier:TowerIdentifier];
+            if (annotationView == nil) {
+                annotationView = [[[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:TowerIdentifier] autorelease];
+                annotationView.image  = [UIImage imageNamed:@"tower.png"];
+                annotationView.canShowCallout = YES;
+                annotationView.calloutOffset = CGPointMake(-5, 5);
+            } else {
+                annotationView.annotation = annotation;
+            }
+            break;
+            
+            
+        default:
+            break;
     }
-    [annotationView setPinColor:annotation == currentPoint? MKPinAnnotationColorGreen:MKPinAnnotationColorRed];
     return annotationView;
 }
 
-- (void) updateLoc {
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {
+    //Put the green point on top
+    if (currentBalloonPin) [[currentBalloonPin superview] bringSubviewToFront:currentBalloonPin];
+}
+
+
+- (void)updateLocWithID:(NSString *)ID {
+    // Update the Balloon Location
     FlightData *f = [FlightData instance];
     if (f.lat && f.lon) {
         CLLocationCoordinate2D loc = {f.lat, f.lon};
-        [self updateWithCurrentLocation: loc];
+        if (fabs(loc.latitude) <= 90 && fabs(loc.longitude) <= 180) {
+            [self updateLocation:loc forIdentifier:ID];
+        }
     }
 }
 

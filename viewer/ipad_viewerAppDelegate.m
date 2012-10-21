@@ -97,8 +97,8 @@
     [picView addedImage];
 }
 
--(void)receivedLocation {
-    [balloonMapLogic updateLoc];
+-(void)receivedLocationForId:(NSString *)ID {
+    [balloonMapLogic updateLocWithID: ID];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

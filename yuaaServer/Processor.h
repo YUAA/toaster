@@ -19,7 +19,7 @@
 @optional
 -(void)receivedTag:(NSString *)theData withValue:(double)val;
 -(void)receivedPicture;
--(void)receivedLocation;
+-(void)receivedLocationForId:(NSString *)ID;
 -(void)serverStatus:(bool) isUp;
 -(void)gettingTags: (bool)b;
 @end
@@ -57,12 +57,12 @@ char* formattedString(char* format, ...);
 
 @property (nonatomic, assign) NSThread *parsingThread;
 
-- (void)updateFromWeb:(NSData *)responseData;
+- (void)updateFromWeb:(NSString *)responseString;
 - (void)updateFromSerialWithData:(NSData *)data;
 
 
 - (void)addLocationToCache;
-- (void)updateData: (char) c fromSerial: (int) fromSerial;
+- (void)updateData: (char) c fromSerial: (int) fromSerial withId:(NSString *)ID;
 - (void)posterThread;
 - (id)initWithPrefs: (Prefs *)p;
 - (NSData *)lastData;

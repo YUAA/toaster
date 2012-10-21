@@ -11,13 +11,15 @@
 
 @implementation DataPoint
 @synthesize coordinate;
+@synthesize type;
+@synthesize ID;
 
 - (NSString *)subtitle{
 	return [NSString stringWithFormat:@"Lon: %f Lat: %f",coordinate.longitude,coordinate.latitude];
 }
 
 - (NSString *)title {
-    return creationDate;
+    return [NSString stringWithFormat:@"%@ - %i",ID, type];
 }
 
 -(id)initWithCoordinate:(CLLocationCoordinate2D)c {
@@ -30,5 +32,9 @@
     [creationDate release];
     [super dealloc];
 }
+
+
+
+
 
 @end

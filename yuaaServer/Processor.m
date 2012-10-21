@@ -38,7 +38,7 @@ char* formattedString(char* format, ...)
 {
     self = [super init];
     if (self) {
-        myUrl = [[NSURL URLWithString: @"http://yaleaerospace.com/scripts/raw.php"] retain];
+        myUrl = [[NSURL URLWithString: @"http://yaleaerospace.com/scripts/downlink.php"] retain];
         storeUrl = [[NSURL URLWithString: @"http://yaleaerospace.com/scripts/store.php"] retain];
         prefs = [p retain];
         lastUpdate = [[NSDate date] retain];
@@ -98,25 +98,39 @@ char* formattedString(char* format, ...)
     [[NSRunLoop currentRunLoop] run];
 }
 
-- (void) updateFromWeb:(NSData *)responseData {
+- (void) updateFromWeb:(NSString *)responseString {
     NSLog(@"Updating From Web");
     
-    char *chars = (char *)[responseData bytes];
-    for (int i=0;i<[responseData length];i++) {
-        [self updateData:chars[i] fromSerial:0];
+    // Parse the String from the Web into 1) Balloon 2) Triangulation [ 3) Cars 4) Towers ]
+    
+    NSArray *devices = [responseString componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
+    
+    for (NSString *deviceString in devices) {
+        
+        NSRange deviceNameRange  = [deviceString rangeOfString:@","];
+        if ([deviceString length] > deviceNameRange.location && deviceNameRange.location > 0) {
+        NSString *deviceName = [deviceString substringToIndex:deviceNameRange.location];
+            NSString *data =[deviceString substringFromIndex:deviceNameRange.location+1];
+            
+            char *chars = (char *)[data UTF8String];
+            
+            for (int i=0;i<[data length];i++) {
+                [self updateData:chars[i] fromSerial:0 withId:deviceName];
+            }
+        }
     }
+    
 }
 
 -(void)updateFromSerialWithData:(NSData *)data {
     NSLog(@"Updating From Serial");
     char *chars = (char *)[data bytes];
     for (int i=0; i < [data length]; i++) {
-        [self updateData:chars[i] fromSerial: 1];
+        [self updateData:chars[i] fromSerial: 1 withId:@"balloon"];
     }
 }
 
-
-- (void) updateData: (char) c fromSerial: (int) fromSerial {
+- (void) updateData: (char) c fromSerial: (int) fromSerial withId: (NSString *)ID {
     
     if (parseTag(c, &tpData)) {
         
@@ -203,6 +217,7 @@ char* formattedString(char* format, ...)
          return;
          }
         */
+        
         NSString *strVal = [[[NSString alloc] initWithBytes: tpData.data length: (NSUInteger)(tpData.dataLength) encoding:NSASCIIStringEncoding] autorelease];
         // Store Log Messages From the Balloon
         if ([strTag isEqualToString: @"MS"]) {
@@ -247,7 +262,7 @@ char* formattedString(char* format, ...)
             }
             if (flightData.lat && flightData.lon) {
                 [self addLocationToCache];
-                [delegate receivedLocation];
+                [delegate receivedLocationForId: ID];
             }
         }
         else if ([strTag isEqualToString: @"BB"]) {
@@ -318,7 +333,6 @@ char* formattedString(char* format, ...)
         okToGet--;
     }
     
-    return;
     // Uplink
     if (gotTags && okToSend == 2) {
         if (cacheStringIndex > 0) {
@@ -362,15 +376,13 @@ char* formattedString(char* format, ...)
     
     NSString *requestResponseString = [request responseString];
     NSURL *requestURL = request.url;
-    NSData *requestData = [request responseData];
     
     [requestResponseString enumerateLinesUsingBlock: ^(NSString *str, BOOL *stop) {
         [flightData.netLogData addObject: str];
     }];
     
     if ([requestURL isEqual: myUrl]) {
-        NSData *responseData = requestData;
-        [self performSelector:@selector(updateFromWeb:) onThread:parsingThread withObject:responseData waitUntilDone:NO];
+        [self performSelector:@selector(updateFromWeb:) onThread:parsingThread withObject:requestResponseString waitUntilDone:NO];
     }
     
     okToSend++;

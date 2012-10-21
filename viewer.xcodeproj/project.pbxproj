@@ -87,6 +87,8 @@
 		22BC44041506DCD100DE7B6D /* FlightData.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BC44021506DCD100DE7B6D /* FlightData.m */; };
 		22BC44071506E01400DE7B6D /* Processor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22EA922414F844F100D83E7D /* Processor.m */; };
 		22BDCAFB14F874C900172DC2 /* StatPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C5CD8A1476B5260017E928 /* StatPoint.m */; };
+		22C25307163388CB00FF3304 /* tower.png in Resources */ = {isa = PBXBuildFile; fileRef = 22C25305163388CB00FF3304 /* tower.png */; };
+		22C25308163388CB00FF3304 /* chase.png in Resources */ = {isa = PBXBuildFile; fileRef = 22C25306163388CB00FF3304 /* chase.png */; };
 		22C5CD1414749D980017E928 /* ipad_viewerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C5CD1314749D980017E928 /* ipad_viewerAppDelegate.m */; };
 		22C5CD1814749DC00017E928 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C5CD1714749DC00017E928 /* DetailViewController.m */; };
 		22C5CD1A14749DCC0017E928 /* DetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C5CD1914749DCC0017E928 /* DetailView.xib */; };
@@ -258,6 +260,8 @@
 		22BC43FD1506BBCC00DE7B6D /* Prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Prefs.m; sourceTree = "<group>"; };
 		22BC44011506DCD100DE7B6D /* FlightData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlightData.h; sourceTree = "<group>"; };
 		22BC44021506DCD100DE7B6D /* FlightData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlightData.m; sourceTree = "<group>"; };
+		22C25305163388CB00FF3304 /* tower.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tower.png; sourceTree = "<group>"; };
+		22C25306163388CB00FF3304 /* chase.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chase.png; sourceTree = "<group>"; };
 		22C5CD1214749D980017E928 /* ipad_viewerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ipad_viewerAppDelegate.h; sourceTree = "<group>"; };
 		22C5CD1314749D980017E928 /* ipad_viewerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ipad_viewerAppDelegate.m; sourceTree = "<group>"; };
 		22C5CD1614749DC00017E928 /* DetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
@@ -624,6 +628,8 @@
 		226C195314679E1B00A7F87A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22C25305163388CB00FF3304 /* tower.png */,
+				22C25306163388CB00FF3304 /* chase.png */,
 				221E6622150A7B8C00FA0AA3 /* ipad.png */,
 				221E6620150A7B8000FA0AA3 /* Default-Landscape~ipad.png */,
 				221E661E150A7B6100FA0AA3 /* Default-Portrait~ipad.png */,
@@ -1099,6 +1105,8 @@
 				221E661F150A7B6100FA0AA3 /* Default-Portrait~ipad.png in Resources */,
 				221E6621150A7B8000FA0AA3 /* Default-Landscape~ipad.png in Resources */,
 				221E6623150A7B8C00FA0AA3 /* ipad.png in Resources */,
+				22C25307163388CB00FF3304 /* tower.png in Resources */,
+				22C25308163388CB00FF3304 /* chase.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

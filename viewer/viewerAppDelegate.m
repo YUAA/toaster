@@ -94,8 +94,9 @@
     [picView addedImage];
 }
 
--(void)receivedLocation {
+-(void)receivedLocationForId:(NSString *)ID {
     balloonMapLogic.okToUpdate = YES;
+    [balloonMapLogic updateLocWithID:ID];
 }
 
 -(void)gettingTags: (bool)b {

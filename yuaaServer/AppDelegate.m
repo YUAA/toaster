@@ -53,7 +53,7 @@
     processor.delegate = self;
     if (!prefs.port) prefs.port = 9000;
     
-    //networkManager = [[NetworkManage alloc] initWithDelegate:self port: prefs.port];
+    networkManager = [[NetworkManage alloc] initWithDelegate:self port: prefs.port];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateConnections:) name:@"connectionUpdate" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rebuildPortList) name:AMSerialPortListDidAddPortsNotification object:nil];
@@ -116,7 +116,6 @@
 }
 
 - (void)recieveData: (NSData *)d {
-    NSLog(@"Got data!");
     [currentSerialPort writeData:d error:NULL];
 }
 
@@ -184,9 +183,6 @@
 
 - (void)parseDemoFile {
     
-    // SAM NEEDS TO FIX THIS
-    
-    
     NSLog(@"Starting demo");
     const char *filePath = [[[NSBundle mainBundle] pathForResource: @"demo" ofType: nil] cStringUsingEncoding:NSASCIIStringEncoding];
     FILE *p = fopen(filePath, "r");
@@ -195,7 +191,7 @@
     int i = 0;
     while (!feof(p) && !currentSerialPort) {
         c = fgetc(p);
-        [processor updateData: c fromSerial: 0];
+        [processor updateData: c fromSerial: 0 withId: @"balloon"];
         [lastUpdate release];
         lastUpdate = [[NSDate date] retain];
         buffer[i++] = c;
