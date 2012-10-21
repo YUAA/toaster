@@ -22,6 +22,7 @@
         prefs = pr;
         browser = [[NSNetServiceBrowser alloc] init];
         [browser setDelegate: self];
+        disconnectTimer = NULL;
         [NSThread detachNewThreadSelector: @selector(ioThread) toTarget:self withObject:nil];
 
         connected = 0;
@@ -111,12 +112,27 @@
     [mainOutput open];
 }
 
+- (void)disconnect:(NSTimer *)timer {
+    NSLog(@"Disconnecting");
+    [mainstream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                      forMode:NSDefaultRunLoopMode];
+    [mainstream close];
+    NSLog(@"Retrying to scan");
+    connected = 0;
+    refreshMe = YES;
+}
+
 - (void)stream:(NSInputStream *)stream handleEvent:(NSStreamEvent)eventCode {
     refreshMe = NO;
     NSLog(@"Something happened!");
     NSLog(@"Stream status is %d", [stream streamStatus]);
         switch(eventCode) {
             case NSStreamEventHasBytesAvailable: {
+                if (disconnectTimer) {
+                    [disconnectTimer invalidate];
+                    [disconnectTimer release];
+                }
+                disconnectTimer = [[NSTimer scheduledTimerWithTimeInterval: 8 target:self selector:@selector(disconnect:) userInfo:nil repeats:NO] retain];
                 NSLog(@"Bytes are found!");
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 while ([stream hasBytesAvailable]) {

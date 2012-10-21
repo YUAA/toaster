@@ -47,10 +47,17 @@
                                                      name: NSFileHandleConnectionAcceptedNotification
                                                    object: fileHandle];
         [fileHandle acceptConnectionInBackgroundAndNotify];
+        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(keepAlive:) userInfo:self repeats:NO];
     }
     
     return self;
 }
+
+- (void)keepAlive:(NSTimer*)timer
+{
+	[self broadcast: @"#"];
+}
+
 
 - (void)netServiceWillResolve:(NSNetService *)sender {
     NSLog(@"Will resolve");

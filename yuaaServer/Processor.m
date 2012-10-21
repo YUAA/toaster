@@ -42,8 +42,7 @@ char* formattedString(char* format, ...)
         storeUrl = [[NSURL URLWithString: @"http://yaleaerospace.com/scripts/store.php"] retain];
         prefs = [p retain];
         lastUpdate = [[NSDate date] retain];
-        okToSend = 1;
-        okToGet = 1;
+        netBusy = 0;
         threadAvailable = 1;
         [NSThread detachNewThreadSelector: @selector(posterThread) toTarget:self withObject:nil];
         
@@ -138,7 +137,6 @@ char* formattedString(char* format, ...)
             if ([delegate respondsToSelector:@selector(gettingTags:)] && fromSerial) {
                 [delegate gettingTags: YES];
                 gotTags = YES;
-                okToSend++;
             }
         }
         FlightData *flightData = [FlightData instance];
@@ -262,7 +260,8 @@ char* formattedString(char* format, ...)
             }
             if (flightData.lat && flightData.lon) {
                 [self addLocationToCache];
-                [delegate receivedLocationForId: ID];
+                if ([delegate respondsToSelector:@selector(gettingTags:)])
+                    [delegate receivedLocationForId: ID];
             }
         }
         else if ([strTag isEqualToString: @"BB"]) {
@@ -329,13 +328,12 @@ char* formattedString(char* format, ...)
             // NSLog(@"Delegate informed of no tags");
         }
         gotTags = NO;
-        okToSend--;
-        okToGet--;
     }
     
     // Uplink
-    if (gotTags && okToSend == 2) {
+    if (netBusy == 0) {
         if (cacheStringIndex > 0) {
+            netBusy++;
             NSString *cache = [[[NSString alloc] initWithBytes: cachedString length: cacheStringIndex encoding:NSASCIIStringEncoding] autorelease];
             NSLog(@"Cache is %@", cache);
             ASIFormDataRequest *r = [ASIFormDataRequest requestWithURL:storeUrl];
@@ -345,21 +343,13 @@ char* formattedString(char* format, ...)
             [r setDelegate:self];
             cacheStringIndex = 0;
             NSLog(@"Putting tags on server");
-            okToSend = 0;
-            okToGet--;
             [r startAsynchronous];
         }
-    }
-    //Downlink from the Server
-    if (!gotTags && okToGet == 1) {
-        okToSend--;
-        okToGet--;
-       
         // Load Raw.php and obtain data for all devices
         ASIFormDataRequest *k = [ASIFormDataRequest requestWithURL:myUrl];
         [k setPostValue: prefs.uuid forKey:@"uid"];
-        //[k setPostValue: @"BalloonCell2" forKey:@"devname"];
         [k setDelegate:self];
+        netBusy++;
         [k startAsynchronous];
     }
 }
@@ -384,10 +374,7 @@ char* formattedString(char* format, ...)
     if ([requestURL isEqual: myUrl]) {
         [self performSelector:@selector(updateFromWeb:) onThread:parsingThread withObject:requestResponseString waitUntilDone:NO];
     }
-    
-    okToSend++;
-    okToGet++;
-    
+    netBusy--;
 }
 - (void)requestFailed:(ASIHTTPRequest *)request
 {
@@ -397,8 +384,7 @@ char* formattedString(char* format, ...)
     [flightData.netLogData addObject: [[request error] description]];
     if ([delegate respondsToSelector:@selector(serverStatus:)])
         [delegate serverStatus: NO];
-    okToSend++;
-    okToGet++;
+    netBusy--;
 }
 
 - (void) dealloc {

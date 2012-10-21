@@ -29,8 +29,7 @@ char* formattedString(char* format, ...);
 @interface Processor : NSObject {
     id delegate;
     
-    int okToSend;
-    int okToGet;
+    int netBusy;
     BOOL cellNew;
     BOOL threadAvailable;
     char cachedString[1024];
@@ -66,7 +65,6 @@ char* formattedString(char* format, ...);
 - (void)posterThread;
 - (id)initWithPrefs: (Prefs *)p;
 - (NSData *)lastData;
-- (void) handleRequestFinished: (ASIHTTPRequest *) request;
 
 @property (retain) id delegate;
 

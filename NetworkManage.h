@@ -33,7 +33,7 @@
 -(id)initWithDelegate:(id)del port:(NSInteger)port;
 -(void)closeConnection:(NetworkConnection *)conn;
 -(void)writeData:(NSData *)d;
-
+- (void)keepAlive:(NSTimer*)timer;
 
 @property (nonatomic, assign) id<NetworkManageDelegate>delegate;
 

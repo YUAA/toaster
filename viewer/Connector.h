@@ -26,8 +26,10 @@
     Prefs *prefs;
     NSNetServiceBrowser *browser;
     Processor *processor;
+    NSTimer *disconnectTimer;
 }
 
+- (void)disconnect:(NSTimer *)timer;
 - (void)handleIO;
 - (void)ioThread;
 - (id)initWithProcessor: (Processor *)p prefs: (Prefs *)pr;
