@@ -22,12 +22,13 @@
 #define CHASE_KEY @"chase"
 #define TOWER_KEY @"tower"
 
+#define USER_LOCATION_UPDATE_FREQUENCY 5
+
 @implementation BalloonMapLogic
 @synthesize okToUpdate;
 
 - (id) initWithPrefs: (Prefs *)p map: (MKMapView *) m {
-    self = [self init];
-    if (self) {
+    if (self = [self init]) {
         prefs = [p retain];
         map = [m retain];
         [map setDelegate: self];
@@ -35,16 +36,11 @@
 
         dataPointHistory = [[NSMutableDictionary alloc] init];
         
-        
         [self updateView];
-        [NSThread detachNewThreadSelector:@selector(poster) toTarget:self withObject:nil];
+        [self postUserLocation];
+        
     }
     return self;
-}
-
-- (void) poster {
-    [NSTimer scheduledTimerWithTimeInterval: 2 target: self selector:@selector(postUserLocation) userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop] run];
 }
 
 - (void) dealloc {
@@ -61,13 +57,55 @@
 }
  */
 
-- (void) postUserLocation {
+
+double GPSToHMS(double coord) {
+    
+    double sign = 0;
+    sign = coord < 0 ? -1.0 : 1.0;
+    coord = coord<0?coord*-1:coord;
+    
+    double hour = 0;
+    double minutes = 0;
+    double seconds = 0;
+    
+    hour = floor(coord);
+    minutes = (coord-hour)*60;
+    //seconds = (coord-hour-minutes/60)*3600;
+    
+    double result = hour + minutes/100;
+    return sign*result;
+}
+
+/*
+double GPSToHMS(double coord) {
+    int sign = 0;
+    
+    int hour = 0;
+    int minutes = 0;
+    int seconds = 0;
+    sign = coord < 0 ? -1 : 1;
+    
+    hour = floor(coord);
+    minutes = floor((coord-hour)*60);
+    seconds = floor((coord-hour-minutes/60)*3600);
+    
+    double result = hour + minutes/100 + seconds/10000;
+    return result;
+}*/
+
+
+- (void)postUserLocation {
+    NSLog(@"Posting User Location");
     char latstr[20];
     char lonstr[20];
     CLLocationCoordinate2D coord = map.userLocation.location.coordinate;
     if (coord.latitude && coord.longitude) {
-        sprintf(latstr,"%+.5f",coord.latitude);
-        sprintf(lonstr,"%+.5f",coord.longitude);
+        
+        double lat = GPSToHMS(coord.latitude);
+        double lon = GPSToHMS(coord.longitude);
+        
+        sprintf(latstr,"%+.8f",lat);
+        sprintf(lonstr,"%+.8f",lon);
         int latlen = strlen(latstr);
         int lonlen = strlen(lonstr);
         
@@ -87,7 +125,16 @@
         
         free(lats);
         free(lons);
+    } else {
+        // No location yet - check again in 5 seconds
+        NSLog(@"No User Location Yet - Will try again shortly");
+        [NSTimer scheduledTimerWithTimeInterval:USER_LOCATION_UPDATE_FREQUENCY target:self selector:@selector(postUserLocation) userInfo:nil repeats:NO];
     }
+}
+
+- (void)requestFinished:(ASIHTTPRequest *)request {
+    // When the user location request finishes, post the location again
+    [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(postUserLocation) userInfo:nil repeats:NO];
 }
 
 
@@ -279,7 +326,18 @@ double myabs(double a) {
     // Update the Balloon Location
     FlightData *f = [FlightData instance];
     if (f.lat && f.lon) {
-        CLLocationCoordinate2D loc = {f.lat, f.lon};
+        
+        //Switch to Google's Decimal GPS representation
+        double latAbs = fabs(f.lat);
+        double lat = (((latAbs - floor(latAbs)) * 100) / 60 + floor(latAbs)) * (f.lat>0?1.0:-1.0);
+        
+        
+        
+        double lonAbs = fabs(f.lon);
+        double lon = (((lonAbs - floor(lonAbs)) * 100) / 60 + floor(lonAbs)) * (f.lon>0?1.0:-1.0);
+        
+        
+        CLLocationCoordinate2D loc = {lat, lon};
         if (fabs(loc.latitude) <= 90 && fabs(loc.longitude) <= 180) {
             [self updateLocation:loc forIdentifier:ID];
         }

@@ -19,6 +19,9 @@
         
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc addObserver:self selector:@selector(dataReceived:) name:NSFileHandleReadCompletionNotification object:fileHandle];
+        
+        
+        
         [fileHandle readInBackgroundAndNotify];
         
     }
@@ -58,11 +61,11 @@
     // [fileHandle writeData: 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     unsigned char end[4] = {4, 4, 4, 4};
-    [fileHandle writeData: [NSData dataWithBytes: &end length:4]];
+    [self writeData:[NSData dataWithBytes: &end length:4]];
     // close([fileHandle fileDescriptor]);
     // [fileHandle closeFile];
     [fileHandle closeFile];
-    [fileHandle autorelease];
+    [fileHandle release];//ar mark
     NSLog(@"I should have closed the connection");
     [super dealloc];
 }

@@ -34,7 +34,7 @@ char* formattedString(char* format, ...);
     BOOL threadAvailable;
     char cachedString[1024];
     int cacheStringIndex;
-    TagParseData tpData;
+    //TagParseData tpData;
     
     int bayCounter;
     Prefs *prefs;
@@ -48,6 +48,7 @@ char* formattedString(char* format, ...);
     int cid;
     
     NSThread *parsingThread;
+    NSMutableDictionary *parserDictionary;
     
     BOOL gotTags;
     
@@ -61,8 +62,12 @@ char* formattedString(char* format, ...);
 
 
 - (void)addLocationToCache;
-- (void)updateData: (char) c fromSerial: (int) fromSerial withId:(NSString *)ID;
-- (void)posterThread;
+//- (void)updateData: (char) c fromSerial: (int) fromSerial withId:(NSString *)ID;
+//-(void)updateData:(TagParseData)tpData fromSerial:(int)fromSerial withId:(NSString *)ID;
+-(void)newTag:(char *)tag withData:(char*)data length:(int)tagDataLength fromSerial:(int)fromSerial withId:(NSString *)ID;
+-(void)parseData:(NSString *)data fromDevice:(NSString *)deviceName fromSerial:(int)s;
+
+//- (void)posterThread;
 - (id)initWithPrefs: (Prefs *)p;
 - (NSData *)lastData;
 

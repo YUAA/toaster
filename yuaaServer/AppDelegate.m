@@ -54,9 +54,9 @@
     [prefsViewController view];
     [FlightData instance];
     
-    processor = [[Processor alloc] initWithPrefs: prefs];
+
     
-    return;
+    processor = [[Processor alloc] initWithPrefs: prefs];
     
     processor.delegate = self;
     if (!prefs.port) prefs.port = 9000;
@@ -92,7 +92,7 @@
 -(void)restartSerial:(NSString *)port {
     NSLog(@"Restaring serial");
     if (currentSerialPort) {
-        [currentSerialPort autorelease];
+        [currentSerialPort release];//ar mark
     }
     if ([port isEqualToString: @"Test Data"]) {
         currentSerialPort = nil;
@@ -107,7 +107,8 @@
                 [currentSerialPort setDelegate:self];
                 if (![currentSerialPort open]) {
                     NSLog(@"Error opening port.");
-                    [currentSerialPort autorelease];
+                    [currentSerialPort release]; //ar mark
+                    currentSerialPort = nil;
                     return;
                 } else {
                     akpsend.serialPort = currentSerialPort;
@@ -175,14 +176,17 @@
 	AMSerialPort *port = [dDictionary valueForKey:@"serialPort"];
 	NSData *d = [dDictionary valueForKey:@"data"];
     [networkManager writeData:d];
-    NSString *str = [[[NSString alloc] initWithData: d encoding:NSASCIIStringEncoding] autorelease];
+    NSString *str = [[NSString alloc] initWithData: d encoding:NSASCIIStringEncoding]; //ar mark
     //const char *d_unsafe = [d bytes];
     [log writeData: d];
-    NSAttributedString *attr = [[[NSAttributedString alloc] initWithString: str] autorelease];
+    NSAttributedString *attr = [[NSAttributedString alloc] initWithString: str]; //ar mark
     [[textForLog textStorage] performSelectorOnMainThread:@selector(appendAttributedString:) withObject:attr waitUntilDone:YES];
     [self performSelectorOnMainThread:@selector(scroller) withObject:nil waitUntilDone:NO];
     [lastUpdate release];
     lastUpdate = [[NSDate date] retain];
+    
+    [str release];
+    [attr release];
     
     [processor performSelector:@selector(updateFromSerialWithData:) onThread:processor.parsingThread withObject:d waitUntilDone:NO];
     
@@ -199,7 +203,7 @@
     int i = 0;
     while (!feof(p) && !currentSerialPort) {
         c = fgetc(p);
-        [processor updateData: c fromSerial: 0 withId: @"balloon"];
+        //[processor updateData: c fromSerial: 0 withId: @"balloon"];
         [lastUpdate release];
         lastUpdate = [[NSDate date] retain];
         buffer[i++] = c;

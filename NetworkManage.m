@@ -105,7 +105,7 @@
             insertedIndexes = [NSIndexSet indexSetWithIndex:[connections count]];
             [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:insertedIndexes forKey:@"connections"];
             [connections addObject:connection];
-            [connection autorelease];
+            [connection release];//ar mark
             [delegate newConnection:connection];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionUpdate" object:[NSNumber numberWithInt:(int)[connections count]]];
         }

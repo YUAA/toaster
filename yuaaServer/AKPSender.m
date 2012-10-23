@@ -40,7 +40,7 @@
 }
 
 - (void) dealloc {
-    [serialPort autorelease];
+    [serialPort release];//ar mark
     [networkLog release];
     [super dealloc];
 }

@@ -28,12 +28,6 @@
 		2244C53E146CDE7300E08F55 /* StatViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2244C53C146CDE7300E08F55 /* StatViewController.xib */; };
 		2244C549146CF25000E08F55 /* protocol.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2244C548146CF24F00E08F55 /* protocol.plist */; };
 		22636EC8147DE94E004B3851 /* BalloonMapLogic.m in Sources */ = {isa = PBXBuildFile; fileRef = 22636EC7147DE94E004B3851 /* BalloonMapLogic.m */; };
-		226A1E8F160D7AF80000304F /* cAkpParser.c in Sources */ = {isa = PBXBuildFile; fileRef = 226A1E8D160D7AF80000304F /* cAkpParser.c */; };
-		226A1E90160D7AF80000304F /* cAkpParser.c in Sources */ = {isa = PBXBuildFile; fileRef = 226A1E8D160D7AF80000304F /* cAkpParser.c */; };
-		226A1E93160D7B670000304F /* crc8.c in Sources */ = {isa = PBXBuildFile; fileRef = 226A1E91160D7B670000304F /* crc8.c */; };
-		226A1E94160D7B670000304F /* crc8.c in Sources */ = {isa = PBXBuildFile; fileRef = 226A1E91160D7B670000304F /* crc8.c */; };
-		226A1E98160D851B0000304F /* exitmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 226A1E95160D7B760000304F /* exitmalloc.c */; };
-		226A1E99160D851C0000304F /* exitmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 226A1E95160D7B760000304F /* exitmalloc.c */; };
 		226C194D14679E1A00A7F87A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226C194C14679E1A00A7F87A /* UIKit.framework */; };
 		226C194F14679E1A00A7F87A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226C194E14679E1A00A7F87A /* Foundation.framework */; };
 		226C195114679E1A00A7F87A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226C195014679E1A00A7F87A /* CoreGraphics.framework */; };
@@ -112,7 +106,6 @@
 		22EA922F14F870EA00D83E7D /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 228CCD3E14BAB556000020D9 /* ASINetworkQueue.m */; };
 		22EA923714F8719200D83E7D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22FE1E131468855B00403F43 /* QuartzCore.framework */; };
 		22FE1DB4146851EA00403F43 /* DataPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FE1DB3146851EA00403F43 /* DataPoint.m */; };
-		22FE1E071468845200403F43 /* libCorePlot-CocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22FE1E061468845200403F43 /* libCorePlot-CocoaTouch.a */; };
 		22FE1E141468855B00403F43 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22FE1E131468855B00403F43 /* QuartzCore.framework */; };
 		22FE1E371468C1CC00403F43 /* icon_information.png in Resources */ = {isa = PBXBuildFile; fileRef = 22FE1E361468C1CC00403F43 /* icon_information.png */; };
 		22FE1E3B1468C22600403F43 /* PrefsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FE1E391468C22600403F43 /* PrefsViewController.m */; };
@@ -127,6 +120,13 @@
 		22FEED5216044FE10028223B /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22FEED5116044FE10028223B /* Quartz.framework */; };
 		22FEED5416044FEA0028223B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22FEED5316044FEA0028223B /* QuartzCore.framework */; };
 		22FEED56160451DC0028223B /* demo in Resources */ = {isa = PBXBuildFile; fileRef = 22BAE97B1513F3A800F03ED2 /* demo */; };
+		DC488F601634658300E4B55B /* cAkpParser.c in Sources */ = {isa = PBXBuildFile; fileRef = DC488F581634654A00E4B55B /* cAkpParser.c */; };
+		DC488F611634658600E4B55B /* exitmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = DC488F5D1634654A00E4B55B /* exitmalloc.c */; };
+		DC488F621634658900E4B55B /* crc8.c in Sources */ = {isa = PBXBuildFile; fileRef = DC488F5B1634654A00E4B55B /* crc8.c */; };
+		DC488F691634E97200E4B55B /* cAkpParser.c in Sources */ = {isa = PBXBuildFile; fileRef = DC488F581634654A00E4B55B /* cAkpParser.c */; };
+		DC488F6A1634E97800E4B55B /* crc8.c in Sources */ = {isa = PBXBuildFile; fileRef = DC488F5B1634654A00E4B55B /* crc8.c */; };
+		DC488F6B1634E97A00E4B55B /* exitmalloc.c in Sources */ = {isa = PBXBuildFile; fileRef = DC488F5D1634654A00E4B55B /* exitmalloc.c */; };
+		DCA4CBB21634FC230058E04D /* libCorePlot-CocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DCA4CBB11634FC230058E04D /* libCorePlot-CocoaTouch.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -172,12 +172,6 @@
 		22636EC6147DE94E004B3851 /* BalloonMapLogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BalloonMapLogic.h; sourceTree = "<group>"; };
 		22636EC7147DE94E004B3851 /* BalloonMapLogic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BalloonMapLogic.m; sourceTree = "<group>"; };
 		22658D28150D4D2F00B15886 /* PrefsResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefsResponder.h; sourceTree = "<group>"; };
-		226A1E8D160D7AF80000304F /* cAkpParser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cAkpParser.c; sourceTree = "<group>"; };
-		226A1E8E160D7AF80000304F /* cAkpParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cAkpParser.h; sourceTree = "<group>"; };
-		226A1E91160D7B670000304F /* crc8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc8.c; sourceTree = "<group>"; };
-		226A1E92160D7B670000304F /* crc8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc8.h; sourceTree = "<group>"; };
-		226A1E95160D7B760000304F /* exitmalloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = exitmalloc.c; sourceTree = "<group>"; };
-		226A1E96160D7B760000304F /* exitmalloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exitmalloc.h; sourceTree = "<group>"; };
 		226C194814679E1A00A7F87A /* viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = viewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		226C194C14679E1A00A7F87A /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		226C194E14679E1A00A7F87A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -388,6 +382,15 @@
 		22FEED5116044FE10028223B /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Quartz.framework; sourceTree = DEVELOPER_DIR; };
 		22FEED5316044FEA0028223B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		22FF50AF1488473B005498C0 /* AbstractControllerShower.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractControllerShower.h; sourceTree = "<group>"; };
+		DC488F581634654A00E4B55B /* cAkpParser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cAkpParser.c; sourceTree = "<group>"; };
+		DC488F591634654A00E4B55B /* cAkpParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cAkpParser.h; sourceTree = "<group>"; };
+		DC488F5A1634654A00E4B55B /* cParseTest.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cParseTest.c; sourceTree = "<group>"; };
+		DC488F5B1634654A00E4B55B /* crc8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = crc8.c; sourceTree = "<group>"; };
+		DC488F5C1634654A00E4B55B /* crc8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crc8.h; sourceTree = "<group>"; };
+		DC488F5D1634654A00E4B55B /* exitmalloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = exitmalloc.c; sourceTree = "<group>"; };
+		DC488F5E1634654A00E4B55B /* exitmalloc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exitmalloc.h; sourceTree = "<group>"; };
+		DCA4CBB11634FC230058E04D /* libCorePlot-CocoaTouch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libCorePlot-CocoaTouch.a"; sourceTree = "<group>"; };
+		DCA4CBB31634FC770058E04D /* CorePlot.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CorePlot.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -407,7 +410,7 @@
 				226C19781467A28C00A7F87A /* MapKit.framework in Frameworks */,
 				226C194F14679E1A00A7F87A /* Foundation.framework in Frameworks */,
 				226C195114679E1A00A7F87A /* CoreGraphics.framework in Frameworks */,
-				22FE1E071468845200403F43 /* libCorePlot-CocoaTouch.a in Frameworks */,
+				DCA4CBB21634FC230058E04D /* libCorePlot-CocoaTouch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +439,7 @@
 		22030BE915058B2100E247EE /* Shared Logic */ = {
 			isa = PBXGroup;
 			children = (
+				226A1E97160D7B7B0000304F /* AKP */,
 				22658D28150D4D2F00B15886 /* PrefsResponder.h */,
 				22BC44051506DCD600DE7B6D /* FlightData */,
 				22B0754E1479F4E0003FEC53 /* BalloonRenderer */,
@@ -551,14 +555,16 @@
 		226A1E97160D7B7B0000304F /* AKP */ = {
 			isa = PBXGroup;
 			children = (
-				226A1E8D160D7AF80000304F /* cAkpParser.c */,
-				226A1E91160D7B670000304F /* crc8.c */,
-				226A1E95160D7B760000304F /* exitmalloc.c */,
-				226A1E96160D7B760000304F /* exitmalloc.h */,
-				226A1E92160D7B670000304F /* crc8.h */,
-				226A1E8E160D7AF80000304F /* cAkpParser.h */,
+				DC488F581634654A00E4B55B /* cAkpParser.c */,
+				DC488F591634654A00E4B55B /* cAkpParser.h */,
+				DC488F5A1634654A00E4B55B /* cParseTest.c */,
+				DC488F5B1634654A00E4B55B /* crc8.c */,
+				DC488F5C1634654A00E4B55B /* crc8.h */,
+				DC488F5D1634654A00E4B55B /* exitmalloc.c */,
+				DC488F5E1634654A00E4B55B /* exitmalloc.h */,
 			);
 			name = AKP;
+			path = yuaaServer;
 			sourceTree = "<group>";
 		};
 		226C193D14679E1900A7F87A = {
@@ -617,6 +623,8 @@
 		226C195214679E1A00A7F87A /* viewer */ = {
 			isa = PBXGroup;
 			children = (
+				DCA4CBB31634FC770058E04D /* CorePlot.framework */,
+				DCA4CBB11634FC230058E04D /* libCorePlot-CocoaTouch.a */,
 				22BC43FB1506B3EC00DE7B6D /* iOS Logic */,
 				221D017014749856006298BD /* iPod */,
 				221D016714749773006298BD /* iPad */,
@@ -747,7 +755,6 @@
 				22B852A014F7F763008CBED6 /* Network */,
 				2222861715081B96006131A4 /* PrefsPopupController */,
 				2222861815081BC4006131A4 /* AKPSender */,
-				226A1E97160D7B7B0000304F /* AKP */,
 				22B8525C14F7F6FF008CBED6 /* Supporting Files */,
 			);
 			path = yuaaServer;
@@ -1135,6 +1142,7 @@
 				226C195D14679E1D00A7F87A /* viewerAppDelegate.m in Sources */,
 				226C196314679E1E00A7F87A /* FlightViewController.m in Sources */,
 				226C197514679E7200A7F87A /* LogViewController.m in Sources */,
+				DC488F691634E97200E4B55B /* cAkpParser.c in Sources */,
 				22FE1DB4146851EA00403F43 /* DataPoint.m in Sources */,
 				22FE1E3B1468C22600403F43 /* PrefsViewController.m in Sources */,
 				2244C53D146CDE7300E08F55 /* StatViewController.m in Sources */,
@@ -1154,6 +1162,8 @@
 				228CCD4314BAB556000020D9 /* ASIDownloadCache.m in Sources */,
 				228CCD4414BAB556000020D9 /* ASIFormDataRequest.m in Sources */,
 				228CCD4514BAB556000020D9 /* ASIHTTPRequest.m in Sources */,
+				DC488F6A1634E97800E4B55B /* crc8.c in Sources */,
+				DC488F6B1634E97A00E4B55B /* exitmalloc.c in Sources */,
 				228CCD4614BAB556000020D9 /* ASIInputStream.m in Sources */,
 				228CCD4714BAB556000020D9 /* ASINetworkQueue.m in Sources */,
 				228CCD4B14BAB5E6000020D9 /* Reachability.m in Sources */,
@@ -1163,9 +1173,6 @@
 				22BC44031506DCD100DE7B6D /* FlightData.m in Sources */,
 				22BC44071506E01400DE7B6D /* Processor.m in Sources */,
 				22ABC3BF15082E3000B490C5 /* GraphViewController.m in Sources */,
-				226A1E90160D7AF80000304F /* cAkpParser.c in Sources */,
-				226A1E94160D7B670000304F /* crc8.c in Sources */,
-				226A1E98160D851B0000304F /* exitmalloc.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1190,6 +1197,9 @@
 				22DEBD0315053A9100C5BD0C /* AKPSender.m in Sources */,
 				22030BE81505864F00E247EE /* GraphLogic.m in Sources */,
 				22BC43FF1506BBCC00DE7B6D /* Prefs.m in Sources */,
+				DC488F621634658900E4B55B /* crc8.c in Sources */,
+				DC488F601634658300E4B55B /* cAkpParser.c in Sources */,
+				DC488F611634658600E4B55B /* exitmalloc.c in Sources */,
 				22BC44041506DCD100DE7B6D /* FlightData.m in Sources */,
 				22DB6985151FB3E30097DFE0 /* AMSerialPort_Deprecated.m in Sources */,
 				22DB6986151FB3E30097DFE0 /* AMSerialPort.m in Sources */,
@@ -1197,9 +1207,6 @@
 				22DB6988151FB3E30097DFE0 /* AMSerialPortList_Deprecated.m in Sources */,
 				22DB6989151FB3E30097DFE0 /* AMSerialPortList.m in Sources */,
 				22DB698A151FB3E30097DFE0 /* AMStandardEnumerator.m in Sources */,
-				226A1E8F160D7AF80000304F /* cAkpParser.c in Sources */,
-				226A1E93160D7B670000304F /* crc8.c in Sources */,
-				226A1E99160D851C0000304F /* exitmalloc.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1289,21 +1296,30 @@
 		226C197014679E1F00A7F87A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/viewer\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "viewer/viewer-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "viewer/viewer-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/viewer\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1312,21 +1328,28 @@
 		226C197114679E1F00A7F87A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/viewer\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "viewer/viewer-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "viewer/viewer-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/viewer\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};

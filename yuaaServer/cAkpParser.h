@@ -55,9 +55,4 @@ typedef struct
 //false is returned and tag and data are not touched.
 bool parseTag(char currentByte, TagParseData* tpData);
 
-
-char getHexOfNibble(char c);
-
-void sendTagCellShield(char *mem, const char* tag, const char* data);
-
 #endif

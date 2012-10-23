@@ -105,7 +105,7 @@
 
 - (void)receivedTag:(NSString *)tag withValue:(double)val {
     if ([tag isEqualToString: @"TI"])
-        [tempButton setTitle: [NSString stringWithFormat:@"%2fº", val]];
+        [tempButton setTitle: [NSString stringWithFormat:@"%.2fºC", val]];
     else if ([tag isEqualToString: @"AL"]) {
         ftInfo = [NSString stringWithFormat: @"%.2f ft " , val];
         [altitudeBtn setTitle: [ftInfo stringByAppendingString: bayInfo]];
