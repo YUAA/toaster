@@ -8,7 +8,7 @@
 
 #import "Processor.h"
 
-#define TAG_POST_DELAY 5
+#define TAG_POST_DELAY 2
 
 //Mallocs a formatted string based on printf
 char* formattedString(char* format, ...)

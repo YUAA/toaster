@@ -22,7 +22,7 @@
 #define CHASE_KEY @"chase"
 #define TOWER_KEY @"tower"
 
-#define USER_LOCATION_UPDATE_FREQUENCY 5
+#define USER_LOCATION_UPDATE_FREQUENCY 2
 
 @implementation BalloonMapLogic
 @synthesize okToUpdate;

@@ -172,21 +172,27 @@
     if (!currentSerialPort && autoconnectname != nil) [self restartSerial:autoconnectname];
 }
 
+
+
 - (void)serialPortReadData:(NSDictionary *)dDictionary {
 	AMSerialPort *port = [dDictionary valueForKey:@"serialPort"];
 	NSData *d = [dDictionary valueForKey:@"data"];
+    
     [networkManager writeData:d];
-    NSString *str = [[NSString alloc] initWithData: d encoding:NSASCIIStringEncoding]; //ar mark
-    //const char *d_unsafe = [d bytes];
+    
+   // NSString *str = [[NSString alloc] initWithData: d encoding:NSASCIIStringEncoding]; //ar mark
+    ////const char *d_unsafe = [d bytes];
+    
     [log writeData: d];
-    NSAttributedString *attr = [[NSAttributedString alloc] initWithString: str]; //ar mark
-    [[textForLog textStorage] performSelectorOnMainThread:@selector(appendAttributedString:) withObject:attr waitUntilDone:YES];
-    [self performSelectorOnMainThread:@selector(scroller) withObject:nil waitUntilDone:NO];
+    
+    //NSAttributedString *attr = [[[NSAttributedString alloc] initWithString: str] autorelease]; //ar mark
+    //[[textForLog textStorage] performSelectorOnMainThread:@selector(appendAttributedString:) withObject:attr waitUntilDone:NO];
+    //[self performSelectorOnMainThread:@selector(scroller) withObject:nil waitUntilDone:NO];
+    
     [lastUpdate release];
     lastUpdate = [[NSDate date] retain];
     
-    [str release];
-    [attr release];
+    //[str release];
     
     [processor performSelector:@selector(updateFromSerialWithData:) onThread:processor.parsingThread withObject:d waitUntilDone:NO];
     
